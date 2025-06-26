@@ -20,11 +20,11 @@ export class GeminiService {
   private baseUrl: string = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
   private constructor() {
-    // Get API key from environment variable
+    // Get API key from environment variable with fallback
     this.apiKey = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyDgR_xkgaphQWNnF88WHvQ05u_nTluzc7I';
     
     if (!this.apiKey || this.apiKey === 'your_gemini_api_key_here') {
-      console.warn('⚠️ Gemini API key not found. Please set VITE_GEMINI_API_KEY in your environment variables.');
+      console.warn('⚠️ Using fallback API key. For production, please set VITE_GEMINI_API_KEY in your environment variables.');
     }
   }
 
@@ -93,7 +93,7 @@ export class GeminiService {
       'vision', 'mission', 'north star', 'okr', 'target', 'benchmark', 'baseline', 'competitor',
       'analysis', 'dashboard', 'app', 'software', 'platform', 'service', 'startup',
       'company', 'business', 'industry', 'build', 'create', 'develop', 'design', 'launch',
-      'brand', 'sunglasses', 'ecommerce', 'saas', 'b2b', 'b2c', 'startup', 'entrepreneur'
+      'brand', 'smartphone', 'ecommerce', 'saas', 'b2b', 'b2c', 'startup', 'entrepreneur'
     ];
 
     // Check if message contains PM keywords
@@ -246,7 +246,7 @@ Remember: You're having an ongoing conversation, not answering isolated question
           temperature: 0.3,
           topK: 20,
           topP: 0.8,
-          maxOutputTokens: 600, // Reduced to manage token usage better
+          maxOutputTokens: 600,
         },
         safetySettings: [
           {
@@ -285,13 +285,27 @@ Remember: You're having an ongoing conversation, not answering isolated question
       if (!response.ok) {
         const errorText = await response.text();
         console.error('API error response:', errorText);
+        
+        // Handle specific API errors
+        if (response.status === 400) {
+          throw new Error('Invalid request. Please check your message and try again.');
+        } else if (response.status === 401) {
+          throw new Error('API key is invalid. Please check your configuration.');
+        } else if (response.status === 403) {
+          throw new Error('API access forbidden. Please check your API key permissions.');
+        } else if (response.status === 429) {
+          throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+        } else if (response.status >= 500) {
+          throw new Error('AI service is temporarily unavailable. Please try again in a moment.');
+        }
+        
         throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
 
       const data: GeminiResponse = await response.json();
       
       if (!data.candidates || data.candidates.length === 0) {
-        throw new Error('No response from AI service');
+        throw new Error('No response from AI service. Please try again.');
       }
 
       let responseText = data.candidates[0].content.parts[0].text;
@@ -315,7 +329,7 @@ Remember: You're having an ongoing conversation, not answering isolated question
           
           currentResponse += (i > 0 ? ' ' : '') + words[i];
           onStream(currentResponse);
-          await new Promise(resolve => setTimeout(resolve, 25)); // Faster streaming
+          await new Promise(resolve => setTimeout(resolve, 25));
         }
       }
 
@@ -324,7 +338,25 @@ Remember: You're having an ongoing conversation, not answering isolated question
       if (error instanceof Error && error.message === 'Request aborted') {
         throw error; // Re-throw abort errors
       }
+      
       console.error('AI service error:', error);
+      
+      // Handle network errors
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error. Please check your internet connection and try again.');
+      }
+      
+      // Re-throw known errors
+      if (error instanceof Error && (
+        error.message.includes('Invalid request') ||
+        error.message.includes('API key') ||
+        error.message.includes('Rate limit') ||
+        error.message.includes('temporarily unavailable')
+      )) {
+        throw error;
+      }
+      
+      // Generic error fallback
       throw new Error('Failed to get response from AI assistant. Please check your connection and try again.');
     }
   }
