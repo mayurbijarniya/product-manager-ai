@@ -22,10 +22,10 @@ export const MessageList: React.FC<MessageListProps> = ({ conversation }) => {
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-4 lg:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
         {conversation.messages.length === 0 && !isLoading && !streamingMessage ? (
           <div className="text-center py-8 sm:py-12">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-base sm:text-lg font-bold text-gray-600 dark:text-gray-400">AI</span>
             </div>
             <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">

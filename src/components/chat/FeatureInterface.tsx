@@ -75,24 +75,24 @@ export const FeatureInterface: React.FC<FeatureInterfaceProps> = ({ featureId })
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-6">
+    <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 sm:p-6">
       <div className="max-w-2xl w-full">
-        <div className={`bg-gradient-to-br ${gradientColor} p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg`}>
-          <div className="text-center mb-8">
+        <div className={`bg-gradient-to-br ${gradientColor} p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg`}>
+          <div className="text-center mb-6 sm:mb-8">
             <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
               <IconComponent className={`w-8 h-8 ${iconColor}`} />
             </div>
             
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
               {feature.title}
             </h1>
             
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
+            <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg">
               {feature.description}
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
+          <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
               <Lightbulb className="w-5 h-5 text-yellow-500 mr-2" />
               How to Use This Feature
@@ -140,7 +140,7 @@ export const FeatureInterface: React.FC<FeatureInterfaceProps> = ({ featureId })
 
           <button
             onClick={handleStartChat}
-            className={`w-full py-4 px-6 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5`}
+            className={`w-full py-3 sm:py-4 px-6 bg-black dark:bg-white text-white dark:text-black rounded-xl font-semibold text-base sm:text-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5`}
           >
             Start {feature.title} Analysis
           </button>

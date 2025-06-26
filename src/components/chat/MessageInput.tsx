@@ -163,8 +163,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   ];
 
   return (
-    <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl">
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+    <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl">
+      <div className="max-w-4xl mx-auto px-4 sm:px-4 lg:px-6 py-4 sm:py-6">
         {showFileUpload && (
           <div className="mb-4">
             <FileUpload 
@@ -225,7 +225,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
           </div>
         </form>
 
-        {/* Quick suggestions */}
+        {/* Quick suggestions - Mobile optimized */}
         {!isLoading && (
           <div className="mt-3 sm:mt-4 flex flex-wrap gap-2">
             {quickSuggestions.map((suggestion) => (

@@ -52,7 +52,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
       </div>
 
       {/* Message Content */}
-      <div className={`flex-1 max-w-3xl ${isUser ? 'flex flex-col items-end' : ''}`}>
+      <div className={`flex-1 max-w-full sm:max-w-3xl ${isUser ? 'flex flex-col items-end' : ''}`}>
         <div className={`flex items-center space-x-2 mb-2 sm:mb-3 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`}>
           <span className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
             {isUser ? 'You' : 'AI Assistant'}
@@ -62,7 +62,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
           </span>
         </div>
 
-        <div className={`rounded-xl sm:rounded-2xl border transition-all duration-200 shadow-lg hover:shadow-xl ${
+        <div className={`rounded-xl sm:rounded-2xl border transition-all duration-200 shadow-lg hover:shadow-xl w-full ${
           isUser 
             ? 'bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-600' 
             : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700'
@@ -90,34 +90,34 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
           )}
         </div>
 
-        {/* Message Actions */}
+        {/* Message Actions - Mobile optimized */}
         {!isUser && (
           <div className="flex items-center space-x-1 mt-2 sm:mt-3 opacity-0 group-hover:opacity-100 transition-all duration-200">
             <button
               onClick={handleCopy}
-              className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-all duration-200 ${
+              className={`p-2 rounded-lg sm:rounded-xl transition-all duration-200 ${
                 copied 
                   ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20' 
                   : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
             >
-              {copied ? <Check className="w-3 h-3 sm:w-4 sm:h-4" /> : <Copy className="w-3 h-3 sm:w-4 sm:h-4" />}
+              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             </button>
             <button
               onClick={handleRegenerate}
-              className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
+              className="p-2 rounded-lg sm:rounded-xl text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
             >
-              <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
+              <RotateCcw className="w-4 h-4" />
             </button>
             <button
               onClick={handleBookmark}
-              className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-all duration-200 ${
+              className={`p-2 rounded-lg sm:rounded-xl transition-all duration-200 ${
                 bookmarked 
                   ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20' 
                   : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
             >
-              <Bookmark className="w-3 h-3 sm:w-4 sm:h-4" />
+              <Bookmark className="w-4 h-4" />
             </button>
           </div>
         )}
