@@ -72,13 +72,13 @@ ${processedFile.content.length > 0 ? `Here's a sample of the data structure: ${J
   };
 
   return (
-    <Card padding="md" className="space-y-6 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700">
+    <Card padding="md" className="space-y-6 bg-white dark:bg-dark-surface border-2 border-light-border dark:border-dark-border">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
-            <BarChart3 className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 bg-primary-600 dark:bg-primary-400 rounded-xl flex items-center justify-center shadow-light dark:shadow-dark">
+            <BarChart3 className="w-4 h-4 text-white dark:text-dark-primary" />
           </div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-bold text-light-text-primary dark:text-dark-text-primary">
             Upload Data Files
           </h3>
         </div>
@@ -90,30 +90,30 @@ ${processedFile.content.length > 0 ? `Here's a sample of the data structure: ${J
         {...getRootProps()}
         className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all duration-200 ${
           isDragActive
-            ? 'border-indigo-500 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 scale-105'
-            : 'border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+            ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-900/20 scale-105'
+            : 'border-light-border dark:border-dark-border hover:border-primary-400 dark:hover:border-primary-500 hover:bg-light-surface dark:hover:bg-dark-surface'
         }`}
       >
         <input {...getInputProps()} />
         <div className="space-y-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-2xl flex items-center justify-center mx-auto">
-            <Upload className="w-8 h-8 text-gray-500 dark:text-gray-400" />
+          <div className="w-16 h-16 bg-light-surface dark:bg-dark-surface rounded-2xl flex items-center justify-center mx-auto shadow-light dark:shadow-dark">
+            <Upload className="w-8 h-8 text-light-text-muted dark:text-dark-text-muted" />
           </div>
           
           {isDragActive ? (
             <div>
-              <p className="text-lg font-medium text-indigo-600 dark:text-indigo-400">Drop files here...</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Release to upload</p>
+              <p className="text-lg font-medium text-primary-600 dark:text-primary-400">Drop files here...</p>
+              <p className="text-sm text-light-text-muted dark:text-dark-text-muted">Release to upload</p>
             </div>
           ) : (
             <div>
-              <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <p className="text-lg font-medium text-light-text-primary dark:text-dark-text-primary mb-2">
                 Drag & drop files here, or click to select
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
                 Supports CSV, Excel, JSON, and TXT files (max 10MB)
               </p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+              <p className="text-xs text-light-text-muted dark:text-dark-text-muted mt-2">
                 Files will be automatically analyzed for PM insights
               </p>
             </div>
@@ -124,8 +124,8 @@ ${processedFile.content.length > 0 ? `Here's a sample of the data structure: ${J
       {/* Uploaded Files */}
       {uploadedFiles.length > 0 && (
         <div className="space-y-4">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center">
-            <FileSpreadsheet className="w-4 h-4 mr-2 text-green-500" />
+          <h4 className="text-sm font-semibold text-light-text-primary dark:text-dark-text-primary flex items-center">
+            <FileSpreadsheet className="w-4 h-4 mr-2 text-success-light dark:text-success-dark" />
             Uploaded Files ({uploadedFiles.length})
           </h4>
           
@@ -135,26 +135,26 @@ ${processedFile.content.length > 0 ? `Here's a sample of the data structure: ${J
               return (
                 <div
                   key={file.name}
-                  className="flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all duration-200"
+                  className="flex items-start justify-between p-4 bg-light-surface dark:bg-dark-surface rounded-xl border border-light-border dark:border-dark-border hover:shadow-light dark:hover:shadow-dark transition-all duration-200"
                 >
                   <div className="flex items-start space-x-3 flex-1 min-w-0">
-                    <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center border border-gray-200 dark:border-gray-600 flex-shrink-0">
-                      <IconComponent className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <div className="w-10 h-10 bg-white dark:bg-dark-primary rounded-xl flex items-center justify-center border border-light-border dark:border-dark-border flex-shrink-0 shadow-light dark:shadow-dark">
+                      <IconComponent className="w-5 h-5 text-light-text-secondary dark:text-dark-text-secondary" />
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <p className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary truncate">
                         {file.name}
                       </p>
                       <div className="flex items-center space-x-4 mt-1">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-light-text-muted dark:text-dark-text-muted">
                           {(file.size / 1024).toFixed(1)} KB
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-light-text-muted dark:text-dark-text-muted">
                           {file.content.length} records
                         </span>
                         {file.processed && (
-                          <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                          <span className="text-xs text-success-light dark:text-success-dark font-medium">
                             ✓ Processed
                           </span>
                         )}
@@ -163,12 +163,12 @@ ${processedFile.content.length > 0 ? `Here's a sample of the data structure: ${J
                       {file.insights && file.insights.length > 0 && (
                         <div className="mt-2 space-y-1">
                           {file.insights.slice(0, 2).map((insight, index) => (
-                            <p key={index} className="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-lg">
+                            <p key={index} className="text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 px-2 py-1 rounded-lg">
                               • {insight}
                             </p>
                           ))}
                           {file.insights.length > 2 && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <p className="text-xs text-light-text-muted dark:text-dark-text-muted">
                               +{file.insights.length - 2} more insights
                             </p>
                           )}
@@ -182,7 +182,7 @@ ${processedFile.content.length > 0 ? `Here's a sample of the data structure: ${J
                     size="sm"
                     icon={X}
                     onClick={() => removeFile(file.name)}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex-shrink-0 ml-2"
+                    className="text-error-light hover:text-error-light/80 hover:bg-error-light/10 dark:text-error-dark dark:hover:text-error-dark/80 dark:hover:bg-error-dark/10 flex-shrink-0 ml-2"
                   />
                 </div>
               );

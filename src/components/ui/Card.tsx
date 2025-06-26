@@ -16,7 +16,7 @@ export const Card: React.FC<CardProps> = ({
   hover = false,
   onClick,
 }) => {
-  const baseClasses = 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg';
+  const baseClasses = 'bg-white dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-2xl shadow-light dark:shadow-dark';
   
   const paddingClasses = {
     none: '',
@@ -25,7 +25,7 @@ export const Card: React.FC<CardProps> = ({
     lg: 'p-8',
   };
   
-  const interactiveClasses = hover || onClick ? 'transition-all duration-200 hover:shadow-xl cursor-pointer hover:-translate-y-0.5' : '';
+  const interactiveClasses = hover || onClick ? 'transition-all duration-200 hover:shadow-light-lg dark:hover:shadow-dark-lg cursor-pointer hover:-translate-y-0.5 hover:border-primary-200 dark:hover:border-primary-800' : '';
 
   return (
     <div

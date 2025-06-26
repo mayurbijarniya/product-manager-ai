@@ -30,10 +30,10 @@ export const Button: React.FC<ButtonProps> = ({
   const baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variantClasses = {
-    primary: 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white focus:ring-indigo-500 shadow-lg hover:shadow-xl',
-    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700',
-    ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500 dark:text-gray-300 dark:hover:bg-gray-800',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-lg hover:shadow-xl',
+    primary: 'bg-primary-600 hover:bg-primary-700 dark:bg-primary-400 dark:hover:bg-primary-300 text-white dark:text-dark-primary focus:ring-primary-600 dark:focus:ring-primary-400 shadow-light dark:shadow-dark hover:shadow-light-md dark:hover:shadow-dark-md',
+    secondary: 'bg-light-surface text-light-text-primary hover:bg-primary-100 focus:ring-primary-600 dark:bg-dark-surface dark:text-dark-text-primary dark:hover:bg-primary-900 dark:focus:ring-primary-400 border border-light-border dark:border-dark-border',
+    ghost: 'text-light-text-secondary hover:bg-light-surface focus:ring-primary-600 dark:text-dark-text-secondary dark:hover:bg-dark-surface dark:focus:ring-primary-400 hover:text-light-text-primary dark:hover:text-dark-text-primary',
+    danger: 'bg-error-light text-white hover:bg-error-light/90 focus:ring-error-light dark:bg-error-dark dark:hover:bg-error-dark/90 dark:focus:ring-error-dark shadow-light dark:shadow-dark hover:shadow-light-md dark:hover:shadow-dark-md',
   };
   
   const sizeClasses = {
@@ -49,6 +49,7 @@ export const Button: React.FC<ButtonProps> = ({
         baseClasses,
         variantClasses[variant],
         sizeClasses[size],
+        'focus:ring-offset-white dark:focus:ring-offset-dark-primary',
         className
       )}
       disabled={disabled || loading}

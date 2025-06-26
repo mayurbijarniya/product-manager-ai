@@ -11,35 +11,46 @@ export default {
         inter: ['Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
+        // Professional Blue-based Design System
+        primary: {
+          50: '#EFF6FF',
+          100: '#DBEAFE',
+          200: '#BFDBFE',
+          300: '#93BBFC',
+          400: '#60A5FA',
+          500: '#3B82F6',
+          600: '#2563EB',
+          700: '#1D4ED8',
+          800: '#1E40AF',
+          900: '#1E3A8A',
+        },
         // Light mode colors
         light: {
           primary: '#FFFFFF',
-          secondary: '#F8F9FA',
-          tertiary: '#F1F3F4',
+          surface: '#F8FAFC',
+          background: '#FFFFFF',
           text: {
-            primary: '#1A1A1A',
-            secondary: '#6B7280',
-            muted: '#9CA3AF',
+            primary: '#0F172A',
+            secondary: '#64748B',
+            muted: '#94A3B8',
           },
-          accent: '#000000',
-          border: '#E5E7EB',
+          border: '#E2E8F0',
           shadow: 'rgba(0, 0, 0, 0.1)',
         },
         // Dark mode colors
         dark: {
-          primary: '#0F0F0F',
-          secondary: '#1A1A1A',
-          tertiary: '#2D2D2D',
+          primary: '#0F172A',
+          surface: '#1E293B',
+          background: '#0F172A',
           text: {
-            primary: '#FFFFFF',
-            secondary: '#A1A1AA',
-            muted: '#71717A',
+            primary: '#F8FAFC',
+            secondary: '#CBD5E1',
+            muted: '#94A3B8',
           },
-          accent: '#FFFFFF',
-          border: '#2D2D2D',
-          shadow: 'rgba(255, 255, 255, 0.1)',
+          border: '#334155',
+          shadow: 'rgba(0, 0, 0, 0.3)',
         },
-        // Semantic colors for both modes
+        // Semantic colors
         success: {
           light: '#059669',
           dark: '#10B981',
@@ -51,10 +62,6 @@ export default {
         error: {
           light: '#DC2626',
           dark: '#EF4444',
-        },
-        info: {
-          light: '#2563EB',
-          dark: '#3B82F6',
         },
       },
       spacing: {
@@ -94,12 +101,12 @@ export default {
         },
       },
       boxShadow: {
-        'light': '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
+        'light': '0 1px 3px rgba(0, 0, 0, 0.1)',
         'light-md': '0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)',
         'light-lg': '0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)',
-        'dark': '0 1px 3px rgba(255, 255, 255, 0.1), 0 1px 2px rgba(255, 255, 255, 0.06)',
-        'dark-md': '0 4px 6px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(255, 255, 255, 0.06)',
-        'dark-lg': '0 10px 15px rgba(255, 255, 255, 0.1), 0 4px 6px rgba(255, 255, 255, 0.05)',
+        'dark': '0 1px 3px rgba(0, 0, 0, 0.3)',
+        'dark-md': '0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2)',
+        'dark-lg': '0 10px 15px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.2)',
       },
     },
   },

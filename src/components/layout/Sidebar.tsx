@@ -22,12 +22,12 @@ import type { PMCategory } from '../../types';
 import { format } from 'date-fns';
 
 const categoryConfig = {
-  strategy: { icon: Target, label: 'Strategy', color: 'text-blue-600 dark:text-blue-400' },
-  execution: { icon: TrendingUp, label: 'Execution', color: 'text-green-600 dark:text-green-400' },
-  research: { icon: Users, label: 'Research', color: 'text-purple-600 dark:text-purple-400' },
-  analytics: { icon: BarChart3, label: 'Analytics', color: 'text-orange-600 dark:text-orange-400' },
-  technical: { icon: Settings, label: 'Technical', color: 'text-gray-600 dark:text-gray-400' },
-  stakeholder: { icon: MessageSquare, label: 'Stakeholder', color: 'text-red-600 dark:text-red-400' },
+  strategy: { icon: Target, label: 'Strategy', color: 'text-primary-600 dark:text-primary-400' },
+  execution: { icon: TrendingUp, label: 'Execution', color: 'text-primary-600 dark:text-primary-400' },
+  research: { icon: Users, label: 'Research', color: 'text-primary-600 dark:text-primary-400' },
+  analytics: { icon: BarChart3, label: 'Analytics', color: 'text-primary-600 dark:text-primary-400' },
+  technical: { icon: Settings, label: 'Technical', color: 'text-primary-600 dark:text-primary-400' },
+  stakeholder: { icon: MessageSquare, label: 'Stakeholder', color: 'text-primary-600 dark:text-primary-400' },
 };
 
 export const Sidebar: React.FC = () => {
@@ -109,25 +109,25 @@ export const Sidebar: React.FC = () => {
       />
 
       {/* Sidebar */}
-      <div className="fixed lg:relative inset-y-0 left-0 w-80 sm:w-80 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/50 z-50 flex flex-col">
+      <div className="fixed lg:relative inset-y-0 left-0 w-80 sm:w-80 bg-light-surface/90 dark:bg-dark-surface/90 backdrop-blur-xl border-r border-light-border dark:border-dark-border z-50 flex flex-col shadow-light dark:shadow-dark">
         {/* Header */}
-        <div className="p-4 border-b border-gray-200/50 dark:border-gray-700/50">
+        <div className="p-4 border-b border-light-border dark:border-dark-border">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            <h2 className="text-lg font-bold text-light-text-primary dark:text-dark-text-primary">
               Conversations
             </h2>
             <div className="flex items-center space-x-1">
               {conversations.length > 0 && (
                 <button
                   onClick={handleClearAll}
-                  className="w-8 h-8 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200"
+                  className="w-8 h-8 flex items-center justify-center text-error-light dark:text-error-dark hover:text-error-light/80 dark:hover:text-error-dark/80 hover:bg-error-light/10 dark:hover:bg-error-dark/10 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-error-light dark:focus:ring-error-dark focus:ring-offset-2 focus:ring-offset-light-surface dark:focus:ring-offset-dark-surface"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
               )}
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200 lg:hidden"
+                className="w-8 h-8 flex items-center justify-center text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary hover:bg-light-surface dark:hover:bg-dark-surface rounded-lg transition-all duration-200 lg:hidden focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-light-surface dark:focus:ring-offset-dark-surface"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -136,7 +136,7 @@ export const Sidebar: React.FC = () => {
           
           <button
             onClick={handleNewConversation}
-            className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] flex items-center justify-center space-x-2 text-base"
+            className="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 dark:bg-primary-400 dark:hover:bg-primary-300 text-white dark:text-dark-primary rounded-xl font-medium transition-all duration-200 shadow-light dark:shadow-dark hover:shadow-light-md dark:hover:shadow-dark-md hover:scale-[1.02] flex items-center justify-center space-x-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-light-surface dark:focus:ring-offset-dark-surface"
           >
             <Plus className="w-4 h-4" />
             <span>New Conversation</span>
@@ -148,13 +148,13 @@ export const Sidebar: React.FC = () => {
           <div className="p-4 space-y-3">
             {conversations.length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <MessageSquare className="w-8 h-8 text-gray-400" />
+                <div className="w-16 h-16 bg-light-surface dark:bg-dark-surface rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-light dark:shadow-dark">
+                  <MessageSquare className="w-8 h-8 text-light-text-muted dark:text-dark-text-muted" />
                 </div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                <p className="text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary mb-1">
                   No conversations yet
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500">
+                <p className="text-xs text-light-text-muted dark:text-dark-text-muted">
                   Start a new one or try a feature below
                 </p>
               </div>
@@ -162,20 +162,20 @@ export const Sidebar: React.FC = () => {
               conversations.map((conversation) => (
                 <div key={conversation.id} className="relative group">
                   {showDeleteConfirm === conversation.id ? (
-                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
-                      <p className="text-sm text-gray-900 dark:text-white mb-3 font-medium">
+                    <div className="bg-error-light/10 dark:bg-error-dark/10 border border-error-light/20 dark:border-error-dark/20 rounded-xl p-4">
+                      <p className="text-sm text-light-text-primary dark:text-dark-text-primary mb-3 font-medium">
                         Delete this conversation?
                       </p>
                       <div className="flex space-x-2">
                         <button
                           onClick={() => confirmDelete(conversation.id)}
-                          className="flex-1 py-2 px-3 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
+                          className="flex-1 py-2 px-3 bg-error-light hover:bg-error-light/90 dark:bg-error-dark dark:hover:bg-error-dark/90 text-white text-sm font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-error-light dark:focus:ring-error-dark focus:ring-offset-2 focus:ring-offset-light-surface dark:focus:ring-offset-dark-surface"
                         >
                           Delete
                         </button>
                         <button
                           onClick={() => setShowDeleteConfirm(null)}
-                          className="flex-1 py-2 px-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm font-medium rounded-lg transition-colors duration-200"
+                          className="flex-1 py-2 px-3 bg-light-surface dark:bg-dark-surface hover:bg-primary-100 dark:hover:bg-primary-900 text-light-text-primary dark:text-dark-text-primary text-sm font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-light-surface dark:focus:ring-offset-dark-surface"
                         >
                           Cancel
                         </button>
@@ -184,26 +184,26 @@ export const Sidebar: React.FC = () => {
                   ) : (
                     <button
                       onClick={() => handleConversationSelect(conversation.id)}
-                      className={`w-full text-left p-4 rounded-xl transition-all duration-200 ${
+                      className={`w-full text-left p-4 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-light-surface dark:focus:ring-offset-dark-surface ${
                         currentConversationId === conversation.id && !selectedFeature
-                          ? 'bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-2 border-indigo-200 dark:border-indigo-800 shadow-md' 
-                          : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md'
+                          ? 'bg-primary-100 dark:bg-primary-900 border-2 border-primary-200 dark:border-primary-800 shadow-light dark:shadow-dark' 
+                          : 'bg-white dark:bg-dark-primary hover:bg-light-surface dark:hover:bg-dark-surface border border-light-border dark:border-dark-border hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-light dark:hover:shadow-dark'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-start space-x-3 flex-1 min-w-0">
-                          <div className="w-8 h-8 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <MessageSquare className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                          <div className="w-8 h-8 bg-light-surface dark:bg-dark-surface rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 shadow-light dark:shadow-dark">
+                            <MessageSquare className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate mb-1">
+                            <p className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary truncate mb-1">
                               {conversation.title}
                             </p>
                             <div className="flex items-center justify-between">
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                              <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
                                 {conversation.messages.length} messages
                               </p>
-                              <p className="text-xs text-gray-400 dark:text-gray-500">
+                              <p className="text-xs text-light-text-muted dark:text-dark-text-muted">
                                 {format(new Date(conversation.updatedAt), 'MMM d')}
                               </p>
                             </div>
@@ -212,7 +212,7 @@ export const Sidebar: React.FC = () => {
                         
                         <button
                           onClick={(e) => handleDeleteConversation(conversation.id, e)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-8 h-8 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg ml-2 flex-shrink-0"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-8 h-8 flex items-center justify-center text-error-light dark:text-error-dark hover:text-error-light/80 dark:hover:text-error-dark/80 hover:bg-error-light/10 dark:hover:bg-error-dark/10 rounded-lg ml-2 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-error-light dark:focus:ring-error-dark focus:ring-offset-2 focus:ring-offset-light-surface dark:focus:ring-offset-dark-surface"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -225,12 +225,12 @@ export const Sidebar: React.FC = () => {
           </div>
 
           {/* PM Features */}
-          <div className="p-4 border-t border-gray-200/50 dark:border-gray-700/50">
+          <div className="p-4 border-t border-light-border dark:border-dark-border">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-3 h-3 text-white" />
+              <div className="w-6 h-6 bg-primary-600 dark:bg-primary-400 rounded-lg flex items-center justify-center">
+                <Sparkles className="w-3 h-3 text-white dark:text-dark-primary" />
               </div>
-              <h3 className="text-sm font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              <h3 className="text-sm font-bold text-light-text-primary dark:text-dark-text-primary">
                 PM Features
               </h3>
             </div>
@@ -246,10 +246,10 @@ export const Sidebar: React.FC = () => {
                   <div key={category}>
                     <button
                       onClick={() => toggleCategory(category as PMCategory)}
-                      className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200"
+                      className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-surface dark:hover:bg-dark-surface hover:text-light-text-primary dark:hover:text-dark-text-primary rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-light-surface dark:focus:ring-offset-dark-surface"
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="w-6 h-6 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                        <div className="w-6 h-6 rounded-lg bg-light-surface dark:bg-dark-surface flex items-center justify-center shadow-light dark:shadow-dark">
                           <config.icon className={`w-3 h-3 ${config.color}`} />
                         </div>
                         <span>{config.label}</span>
@@ -269,10 +269,10 @@ export const Sidebar: React.FC = () => {
                           <button
                             key={action.id}
                             onClick={() => handleFeatureClick(action.id)}
-                            className={`w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 ${
+                            className={`w-full text-left px-3 py-2.5 text-sm rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-light-surface dark:focus:ring-offset-dark-surface ${
                               selectedFeature === action.id
-                                ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm'
-                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200'
+                                ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 shadow-light dark:shadow-dark'
+                                : 'text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-surface dark:hover:bg-dark-surface hover:text-light-text-primary dark:hover:text-dark-text-primary'
                             }`}
                           >
                             {action.title}

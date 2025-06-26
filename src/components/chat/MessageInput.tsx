@@ -163,7 +163,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   ];
 
   return (
-    <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl">
+    <div className="border-t border-light-border dark:border-dark-border bg-white/90 dark:bg-dark-primary/90 backdrop-blur-xl">
       <div className="max-w-4xl mx-auto px-4 sm:px-4 lg:px-6 py-4 sm:py-6">
         {showFileUpload && (
           <div className="mb-4">
@@ -181,14 +181,14 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
               type="button"
               onClick={() => setShowFileUpload(!showFileUpload)}
               disabled={isLoading}
-              className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl sm:rounded-2xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
+              className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-light-text-muted hover:text-primary-600 dark:text-dark-text-muted dark:hover:text-primary-400 hover:bg-light-surface dark:hover:bg-dark-surface rounded-xl sm:rounded-2xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-primary"
             >
               <Paperclip className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform duration-200" />
             </button>
 
             {/* Message Input Container */}
             <div className="flex-1 relative">
-              <div className="relative bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-200 focus-within:ring-2 focus-within:ring-indigo-500 dark:focus-within:ring-indigo-400 focus-within:border-transparent">
+              <div className="relative bg-white dark:bg-dark-surface rounded-xl sm:rounded-2xl border border-light-border dark:border-dark-border shadow-light dark:shadow-dark hover:shadow-light-md dark:hover:shadow-dark-md transition-all duration-200 focus-within:ring-2 focus-within:ring-primary-600 dark:focus-within:ring-primary-400 focus-within:border-transparent">
                 <textarea
                   ref={textareaRef}
                   value={message}
@@ -196,7 +196,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                   onKeyDown={handleKeyDown}
                   placeholder="Ask about product strategy, roadmapping, user research, or any PM topic..."
                   disabled={isLoading}
-                  className="w-full px-4 sm:px-6 py-3 sm:py-4 pr-12 sm:pr-16 resize-none focus:outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 transition-all duration-200 text-sm sm:text-base"
+                  className="w-full px-4 sm:px-6 py-3 sm:py-4 pr-12 sm:pr-16 resize-none focus:outline-none bg-transparent text-light-text-primary dark:text-dark-text-primary placeholder-light-text-muted dark:placeholder-dark-text-muted disabled:opacity-50 transition-all duration-200 text-sm sm:text-base"
                   rows={1}
                   style={{ minHeight: '48px', maxHeight: '120px' }}
                 />
@@ -206,12 +206,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                   type={isLoading ? 'button' : 'submit'}
                   onClick={isLoading ? handleStop : undefined}
                   disabled={!isLoading && !message.trim()}
-                  className={`absolute right-2 sm:right-3 bottom-2 sm:bottom-3 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-200 ${
+                  className={`absolute right-2 sm:right-3 bottom-2 sm:bottom-3 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                     isLoading
-                      ? 'text-white bg-red-500 hover:bg-red-600 shadow-lg hover:shadow-xl'
+                      ? 'text-white bg-error-light hover:bg-error-light/90 dark:bg-error-dark dark:hover:bg-error-dark/90 shadow-light dark:shadow-dark hover:shadow-light-md dark:hover:shadow-dark-md focus:ring-error-light dark:focus:ring-error-dark focus:ring-offset-white dark:focus:ring-offset-dark-surface'
                       : message.trim()
-                      ? 'text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl hover:scale-105'
-                      : 'text-gray-400 bg-gray-100 dark:bg-gray-700 cursor-not-allowed'
+                      ? 'text-white dark:text-dark-primary bg-primary-600 hover:bg-primary-700 dark:bg-primary-400 dark:hover:bg-primary-300 shadow-light dark:shadow-dark hover:shadow-light-md dark:hover:shadow-dark-md hover:scale-105 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-white dark:focus:ring-offset-dark-surface'
+                      : 'text-light-text-muted bg-light-surface dark:bg-dark-surface cursor-not-allowed'
                   }`}
                 >
                   {isLoading ? (
@@ -233,7 +233,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                 key={suggestion}
                 onClick={() => setMessage(suggestion)}
                 disabled={isLoading}
-                className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-md"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-light-surface dark:bg-dark-surface text-light-text-secondary dark:text-dark-text-secondary rounded-full hover:bg-primary-100 dark:hover:bg-primary-900 hover:text-primary-700 dark:hover:text-primary-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border border-light-border dark:border-dark-border hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-light dark:hover:shadow-dark focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-primary"
               >
                 {suggestion}
               </button>
@@ -242,7 +242,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
         )}
 
         {/* Footer info */}
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 sm:mt-4 text-center">
+        <p className="text-xs text-light-text-muted dark:text-dark-text-muted mt-3 sm:mt-4 text-center">
           AI can make mistakes. Always verify important information and strategic decisions.
         </p>
       </div>
