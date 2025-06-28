@@ -160,17 +160,14 @@ RESPONSE STYLE:
 - Reference industry best practices
 - Avoid overly long responses unless specifically requested
 
-TABLE FORMATTING RULES:
-- When creating tables, use simple markdown format
-- For competitive analysis, market research, or feature comparison tables, provide COMPLETE and DETAILED content
-- Use clear, descriptive headers
-- Include ALL requested data points in the table
-- For competitive analysis tables, include: Competitor Name, Strengths, Weaknesses, Market Position, Key Features, Pricing Model
-- For market research tables, include: Research Area, Key Questions, Methodology, Sample Size, Timeline, Expected Insights
-- For feature comparison tables, include: Feature Name, Our Product, Competitor A, Competitor B, Competitor C, Strategic Notes
-- ALWAYS complete the full table with real, detailed content - never use placeholder text
-- Provide actionable insights after each table
-- Break very large tables into focused sections if needed
+CRITICAL TABLE RULES:
+- When asked for tables, ALWAYS provide complete, detailed tables with real data
+- Use proper markdown table format with | separators
+- Include ALL columns requested (minimum 4-5 columns for competitive analysis)
+- Fill every cell with meaningful, specific content - NEVER use placeholder text
+- For competitive analysis: Include Competitor Name | Strengths | Weaknesses | Market Position | Key Features
+- Always complete the entire table before moving to additional content
+- If table is large, break into focused sections but complete each section fully
 
 FORBIDDEN TOPICS:
 If asked about non-PM topics (sports, weather, entertainment, currency exchange, etc.), respond ONLY with: "I'm a Product Manager AI assistant. Please ask me questions about product strategy, roadmapping, user research, analytics, or other product management topics."
@@ -257,26 +254,34 @@ Remember: You're having an ongoing conversation, not answering isolated question
         }
       });
 
+      // Determine if this is a table request and adjust configuration accordingly
+      const isTableGeneration = this.isTableRequest(message);
+      
+      // Enhanced message for table requests to force completion
+      let enhancedMessage = message;
+      if (isTableGeneration) {
+        enhancedMessage = `${message}
+
+IMPORTANT: Please provide a COMPLETE table with ALL rows filled out. Do not stop at headers or partial content. Include at least 3-5 competitors/items with detailed information in every column. Complete the entire table before adding any additional commentary.`;
+      }
+
       // Add current message
       contents.push({
         role: 'user',
-        parts: [{ text: message }]
+        parts: [{ text: enhancedMessage }]
       });
 
-      // Determine if this is a table request and adjust token allocation accordingly
-      const isTableGeneration = this.isTableRequest(message);
-      const maxTokens = isTableGeneration ? 5000 : 1000; // 5x more tokens for tables
-
-      console.log(`🎯 Table request detected: ${isTableGeneration}, using ${maxTokens} tokens`);
+      console.log(`🎯 Table request detected: ${isTableGeneration}`);
 
       const requestBody = {
         contents: contents,
         generationConfig: {
-          temperature: isTableGeneration ? 0.05 : 0.1, // Even lower temperature for tables
-          topK: isTableGeneration ? 5 : 10, // More focused for tables
-          topP: isTableGeneration ? 0.6 : 0.7, // More deterministic for tables
-          maxOutputTokens: maxTokens, // Dynamic token allocation
-          candidateCount: 1, // Single candidate for consistency
+          temperature: 0.1,
+          topK: 10,
+          topP: 0.7,
+          maxOutputTokens: 1000,
+          candidateCount: 1,
+          stopSequences: [], // Remove any stop sequences that might interrupt tables
         },
         safetySettings: [
           {
@@ -364,7 +369,7 @@ Remember: You're having an ongoing conversation, not answering isolated question
         let currentResponse = '';
         
         // Adjust streaming speed based on content length
-        const streamDelay = isTableGeneration ? 10 : 15; // Faster for tables
+        const streamDelay = 15;
         
         for (let i = 0; i < words.length; i++) {
           // Check if request was aborted during streaming
