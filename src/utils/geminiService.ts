@@ -162,10 +162,12 @@ RESPONSE STYLE:
 
 TABLE FORMATTING RULES:
 - When creating tables, use simple markdown format
-- Keep tables concise (max 5-6 columns, 8-10 rows)
+- Keep tables concise (max 4-5 columns, 6-8 rows for complex data)
 - Use clear, short headers
 - Provide complete table content in one response
-- Don't create overly complex tables that might cause parsing issues
+- For competitive analysis tables, focus on 3-4 key competitors max
+- Break large tables into smaller, focused sections if needed
+- Always complete the full table before ending response
 
 FORBIDDEN TOPICS:
 If asked about non-PM topics (sports, weather, entertainment, currency exchange, etc.), respond ONLY with: "I'm a Product Manager AI assistant. Please ask me questions about product strategy, roadmapping, user research, analytics, or other product management topics."
@@ -225,8 +227,8 @@ Remember: You're having an ongoing conversation, not answering isolated question
         });
       }
 
-      // Add conversation history (last 8 messages to manage token usage and prevent context overflow)
-      const recentHistory = conversationHistory.slice(-8);
+      // Add conversation history (last 6 messages to manage token usage and prevent context overflow)
+      const recentHistory = conversationHistory.slice(-6);
       recentHistory.forEach(msg => {
         if (msg.role === 'user') {
           contents.push({
@@ -250,11 +252,11 @@ Remember: You're having an ongoing conversation, not answering isolated question
       const requestBody = {
         contents: contents,
         generationConfig: {
-          temperature: 0.2, // Lower temperature for more consistent output
-          topK: 40, // Increased for better variety
-          topP: 0.9, // Slightly higher for better completion
-          maxOutputTokens: 800, // Increased token limit for complete responses
-          stopSequences: [], // Remove any stop sequences that might interrupt tables
+          temperature: 0.1, // Very low temperature for consistent, complete responses
+          topK: 10, // Reduced for more focused responses
+          topP: 0.7, // Lower for more deterministic output
+          maxOutputTokens: 1000, // Increased token limit for complete tables
+          candidateCount: 1, // Single candidate for consistency
         },
         safetySettings: [
           {
@@ -326,6 +328,9 @@ Remember: You're having an ongoing conversation, not answering isolated question
         throw new Error('Response was blocked due to safety concerns. Please rephrase your question.');
       } else if (finishReason === 'RECITATION') {
         throw new Error('Response was blocked due to recitation concerns. Please try a different approach.');
+      } else if (finishReason === 'OTHER') {
+        // Sometimes the API stops for unknown reasons - this might be the table generation issue
+        console.warn('API stopped for unknown reason. Response might be incomplete.');
       }
 
       // Simulate streaming if callback provided
@@ -341,7 +346,7 @@ Remember: You're having an ongoing conversation, not answering isolated question
           
           currentResponse += (i > 0 ? ' ' : '') + words[i];
           onStream(currentResponse);
-          await new Promise(resolve => setTimeout(resolve, 20)); // Slightly faster streaming
+          await new Promise(resolve => setTimeout(resolve, 15)); // Faster streaming
         }
       }
 
