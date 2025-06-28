@@ -160,6 +160,13 @@ RESPONSE STYLE:
 - Reference industry best practices
 - Avoid overly long responses unless specifically requested
 
+TABLE FORMATTING RULES:
+- When creating tables, use simple markdown format
+- Keep tables concise (max 5-6 columns, 8-10 rows)
+- Use clear, short headers
+- Provide complete table content in one response
+- Don't create overly complex tables that might cause parsing issues
+
 FORBIDDEN TOPICS:
 If asked about non-PM topics (sports, weather, entertainment, currency exchange, etc.), respond ONLY with: "I'm a Product Manager AI assistant. Please ask me questions about product strategy, roadmapping, user research, analytics, or other product management topics."
 
@@ -218,8 +225,8 @@ Remember: You're having an ongoing conversation, not answering isolated question
         });
       }
 
-      // Add conversation history (last 10 messages to manage token usage)
-      const recentHistory = conversationHistory.slice(-10);
+      // Add conversation history (last 8 messages to manage token usage and prevent context overflow)
+      const recentHistory = conversationHistory.slice(-8);
       recentHistory.forEach(msg => {
         if (msg.role === 'user') {
           contents.push({
@@ -243,10 +250,11 @@ Remember: You're having an ongoing conversation, not answering isolated question
       const requestBody = {
         contents: contents,
         generationConfig: {
-          temperature: 0.3,
-          topK: 20,
-          topP: 0.8,
-          maxOutputTokens: 600,
+          temperature: 0.2, // Lower temperature for more consistent output
+          topK: 40, // Increased for better variety
+          topP: 0.9, // Slightly higher for better completion
+          maxOutputTokens: 800, // Increased token limit for complete responses
+          stopSequences: [], // Remove any stop sequences that might interrupt tables
         },
         safetySettings: [
           {
@@ -311,9 +319,13 @@ Remember: You're having an ongoing conversation, not answering isolated question
       let responseText = data.candidates[0].content.parts[0].text;
       const finishReason = data.candidates[0].finishReason;
 
-      // Handle token limit reached
+      // Handle different finish reasons
       if (finishReason === 'MAX_TOKENS') {
         responseText += '\n\n*[Response truncated due to length limit. Please ask for specific details if you need more information.]*';
+      } else if (finishReason === 'SAFETY') {
+        throw new Error('Response was blocked due to safety concerns. Please rephrase your question.');
+      } else if (finishReason === 'RECITATION') {
+        throw new Error('Response was blocked due to recitation concerns. Please try a different approach.');
       }
 
       // Simulate streaming if callback provided
@@ -329,7 +341,7 @@ Remember: You're having an ongoing conversation, not answering isolated question
           
           currentResponse += (i > 0 ? ' ' : '') + words[i];
           onStream(currentResponse);
-          await new Promise(resolve => setTimeout(resolve, 25));
+          await new Promise(resolve => setTimeout(resolve, 20)); // Slightly faster streaming
         }
       }
 
@@ -351,7 +363,9 @@ Remember: You're having an ongoing conversation, not answering isolated question
         error.message.includes('Invalid request') ||
         error.message.includes('API key') ||
         error.message.includes('Rate limit') ||
-        error.message.includes('temporarily unavailable')
+        error.message.includes('temporarily unavailable') ||
+        error.message.includes('safety concerns') ||
+        error.message.includes('recitation concerns')
       )) {
         throw error;
       }
