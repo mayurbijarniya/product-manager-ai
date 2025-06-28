@@ -29,15 +29,15 @@ export const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
                 {String(children).replace(/\n$/, '')}
               </SyntaxHighlighter>
             ) : (
-              <code className={className} {...props}>
+              <code className={`${className} bg-light-surface dark:bg-dark-surface px-1.5 py-0.5 rounded text-sm font-mono`} {...props}>
                 {children}
               </code>
             );
           },
           table({ children }) {
             return (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <div className="overflow-x-auto my-4 rounded-xl border border-light-border dark:border-dark-border shadow-light dark:shadow-dark">
+                <table className="min-w-full divide-y divide-light-border dark:divide-dark-border">
                   {children}
                 </table>
               </div>
@@ -45,79 +45,131 @@ export const MessageContent: React.FC<MessageContentProps> = ({ content }) => {
           },
           thead({ children }) {
             return (
-              <thead className="bg-gray-50 dark:bg-gray-800">
+              <thead className="bg-light-surface dark:bg-dark-surface">
                 {children}
               </thead>
             );
           },
+          tbody({ children }) {
+            return (
+              <tbody className="bg-white dark:bg-dark-primary divide-y divide-light-border dark:divide-dark-border">
+                {children}
+              </tbody>
+            );
+          },
+          tr({ children }) {
+            return (
+              <tr className="hover:bg-light-surface dark:hover:bg-dark-surface transition-colors duration-150">
+                {children}
+              </tr>
+            );
+          },
           th({ children }) {
             return (
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary uppercase tracking-wider border-b border-light-border dark:border-dark-border">
                 {children}
               </th>
             );
           },
           td({ children }) {
             return (
-              <td className="px-4 py-2 text-sm text-gray-900 dark:text-gray-100 border-t border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-3 text-sm text-light-text-primary dark:text-dark-text-primary whitespace-nowrap">
                 {children}
               </td>
             );
           },
           h1({ children }) {
             return (
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              <h1 className="text-xl font-bold text-light-text-primary dark:text-dark-text-primary mb-4 mt-6 first:mt-0">
                 {children}
               </h1>
             );
           },
           h2({ children }) {
             return (
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 mt-6">
+              <h2 className="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-3 mt-6 first:mt-0">
                 {children}
               </h2>
             );
           },
           h3({ children }) {
             return (
-              <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2 mt-4">
+              <h3 className="text-base font-semibold text-light-text-primary dark:text-dark-text-primary mb-2 mt-4 first:mt-0">
                 {children}
               </h3>
             );
           },
+          h4({ children }) {
+            return (
+              <h4 className="text-sm font-semibold text-light-text-primary dark:text-dark-text-primary mb-2 mt-3 first:mt-0">
+                {children}
+              </h4>
+            );
+          },
           p({ children }) {
             return (
-              <p className="text-gray-700 dark:text-gray-300 mb-3 leading-relaxed">
+              <p className="text-light-text-primary dark:text-dark-text-primary mb-3 leading-relaxed">
                 {children}
               </p>
             );
           },
           ul({ children }) {
             return (
-              <ul className="list-disc list-inside space-y-1 mb-4 text-gray-700 dark:text-gray-300">
+              <ul className="list-disc list-inside space-y-1 mb-4 text-light-text-primary dark:text-dark-text-primary ml-4">
                 {children}
               </ul>
             );
           },
           ol({ children }) {
             return (
-              <ol className="list-decimal list-inside space-y-1 mb-4 text-gray-700 dark:text-gray-300">
+              <ol className="list-decimal list-inside space-y-1 mb-4 text-light-text-primary dark:text-dark-text-primary ml-4">
                 {children}
               </ol>
             );
           },
+          li({ children }) {
+            return (
+              <li className="text-light-text-primary dark:text-dark-text-primary">
+                {children}
+              </li>
+            );
+          },
           strong({ children }) {
             return (
-              <strong className="font-semibold text-gray-900 dark:text-white">
+              <strong className="font-semibold text-light-text-primary dark:text-dark-text-primary">
                 {children}
               </strong>
             );
           },
+          em({ children }) {
+            return (
+              <em className="italic text-light-text-secondary dark:text-dark-text-secondary">
+                {children}
+              </em>
+            );
+          },
           blockquote({ children }) {
             return (
-              <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
+              <blockquote className="border-l-4 border-primary-600 dark:border-primary-400 pl-4 italic text-light-text-secondary dark:text-dark-text-secondary my-4 bg-light-surface dark:bg-dark-surface py-2 rounded-r-lg">
                 {children}
               </blockquote>
+            );
+          },
+          hr() {
+            return (
+              <hr className="my-6 border-light-border dark:border-dark-border" />
+            );
+          },
+          a({ href, children }) {
+            return (
+              <a 
+                href={href} 
+                className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 underline transition-colors duration-200"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {children}
+              </a>
             );
           },
         }}
