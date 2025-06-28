@@ -162,17 +162,31 @@ RESPONSE STYLE:
 
 TABLE FORMATTING RULES:
 - When creating tables, use simple markdown format
-- Keep tables concise (max 4-5 columns, 6-8 rows for complex data)
-- Use clear, short headers
-- Provide complete table content in one response
-- For competitive analysis tables, focus on 3-4 key competitors max
-- Break large tables into smaller, focused sections if needed
-- Always complete the full table before ending response
+- For competitive analysis, market research, or feature comparison tables, provide COMPLETE and DETAILED content
+- Use clear, descriptive headers
+- Include ALL requested data points in the table
+- For competitive analysis tables, include: Competitor Name, Strengths, Weaknesses, Market Position, Key Features, Pricing Model
+- For market research tables, include: Research Area, Key Questions, Methodology, Sample Size, Timeline, Expected Insights
+- For feature comparison tables, include: Feature Name, Our Product, Competitor A, Competitor B, Competitor C, Strategic Notes
+- ALWAYS complete the full table with real, detailed content - never use placeholder text
+- Provide actionable insights after each table
+- Break very large tables into focused sections if needed
 
 FORBIDDEN TOPICS:
 If asked about non-PM topics (sports, weather, entertainment, currency exchange, etc.), respond ONLY with: "I'm a Product Manager AI assistant. Please ask me questions about product strategy, roadmapping, user research, analytics, or other product management topics."
 
 Remember: You're having an ongoing conversation, not answering isolated questions. Build context and provide increasingly valuable insights as the conversation develops.`;
+  }
+
+  private isTableRequest(message: string): boolean {
+    const lowerMessage = message.toLowerCase();
+    const tableKeywords = [
+      'table', 'competitive analysis', 'comparison', 'matrix', 'framework',
+      'market research', 'feature comparison', 'competitor', 'analysis',
+      'in table format', 'table format', 'create table', 'show table'
+    ];
+    
+    return tableKeywords.some(keyword => lowerMessage.includes(keyword));
   }
 
   async sendMessage(
@@ -249,13 +263,19 @@ Remember: You're having an ongoing conversation, not answering isolated question
         parts: [{ text: message }]
       });
 
+      // Determine if this is a table request and adjust token allocation accordingly
+      const isTableGeneration = this.isTableRequest(message);
+      const maxTokens = isTableGeneration ? 5000 : 1000; // 5x more tokens for tables
+
+      console.log(`🎯 Table request detected: ${isTableGeneration}, using ${maxTokens} tokens`);
+
       const requestBody = {
         contents: contents,
         generationConfig: {
-          temperature: 0.1, // Very low temperature for consistent, complete responses
-          topK: 10, // Reduced for more focused responses
-          topP: 0.7, // Lower for more deterministic output
-          maxOutputTokens: 1000, // Increased token limit for complete tables
+          temperature: isTableGeneration ? 0.05 : 0.1, // Even lower temperature for tables
+          topK: isTableGeneration ? 5 : 10, // More focused for tables
+          topP: isTableGeneration ? 0.6 : 0.7, // More deterministic for tables
+          maxOutputTokens: maxTokens, // Dynamic token allocation
           candidateCount: 1, // Single candidate for consistency
         },
         safetySettings: [
@@ -333,10 +353,18 @@ Remember: You're having an ongoing conversation, not answering isolated question
         console.warn('API stopped for unknown reason. Response might be incomplete.');
       }
 
+      // Log token usage for debugging
+      if (data.usageMetadata) {
+        console.log(`📊 Token usage: ${data.usageMetadata.totalTokenCount} total (${data.usageMetadata.candidatesTokenCount} response)`);
+      }
+
       // Simulate streaming if callback provided
       if (onStream) {
         const words = responseText.split(' ');
         let currentResponse = '';
+        
+        // Adjust streaming speed based on content length
+        const streamDelay = isTableGeneration ? 10 : 15; // Faster for tables
         
         for (let i = 0; i < words.length; i++) {
           // Check if request was aborted during streaming
@@ -346,7 +374,7 @@ Remember: You're having an ongoing conversation, not answering isolated question
           
           currentResponse += (i > 0 ? ' ' : '') + words[i];
           onStream(currentResponse);
-          await new Promise(resolve => setTimeout(resolve, 15)); // Faster streaming
+          await new Promise(resolve => setTimeout(resolve, streamDelay));
         }
       }
 
