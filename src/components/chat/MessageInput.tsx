@@ -175,20 +175,20 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
         )}
         
         <form onSubmit={handleSubmit} className="relative">
-          <div className="flex items-start gap-3">
-            {/* File Upload Button - Fixed height to match input */}
+          <div className="flex items-center gap-3">
+            {/* File Upload Button - Same height as input, centered */}
             <button
               type="button"
               onClick={() => setShowFileUpload(!showFileUpload)}
               disabled={isLoading}
-              className="flex-shrink-0 w-14 h-14 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 shadow-md hover:shadow-lg hover:scale-105 border border-gray-200 dark:border-gray-700"
+              className="flex-shrink-0 w-12 h-12 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 shadow-md hover:shadow-lg hover:scale-105 border border-gray-200 dark:border-gray-700"
             >
-              <Paperclip className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
+              <Paperclip className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
             </button>
 
-            {/* Message Input Container - Fixed height */}
+            {/* Message Input Container */}
             <div className="flex-1 relative">
-              <div className="relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent overflow-hidden min-h-[56px]">
+              <div className="relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
                 <textarea
                   ref={textareaRef}
@@ -197,17 +197,17 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                   onKeyDown={handleKeyDown}
                   placeholder="Ask about product strategy, roadmapping, user research, or any PM topic..."
                   disabled={isLoading}
-                  className="relative w-full px-6 py-4 pr-16 resize-none focus:outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 transition-all duration-200 text-base leading-relaxed"
+                  className="relative w-full px-6 py-3 pr-14 resize-none focus:outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 transition-all duration-200 text-base leading-relaxed min-h-[48px]"
                   rows={1}
-                  style={{ minHeight: '56px', maxHeight: '120px' }}
+                  style={{ maxHeight: '120px' }}
                 />
                 
-                {/* Send/Stop Button */}
+                {/* Send/Stop Button - Same size as paperclip */}
                 <button
                   type={isLoading ? 'button' : 'submit'}
                   onClick={isLoading ? handleStop : undefined}
                   disabled={!isLoading && !message.trim()}
-                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg ${
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md ${
                     isLoading
                       ? 'text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105 focus:ring-red-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
                       : message.trim()
