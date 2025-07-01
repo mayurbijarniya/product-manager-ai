@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Square } from 'lucide-react';
+import { Send, Paperclip, Square, Sparkles, Zap } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { FileUpload } from '../features/FileUpload';
 import { useAppStore } from '../../stores/appStore';
@@ -163,7 +163,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   ];
 
   return (
-    <div className="border-t border-light-border dark:border-dark-border bg-white/90 dark:bg-dark-primary/90 backdrop-blur-xl">
+    <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl">
       <div className="max-w-4xl mx-auto px-4 sm:px-4 lg:px-6 py-4 sm:py-6">
         {showFileUpload && (
           <div className="mb-4">
@@ -175,20 +175,21 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
         )}
         
         <form onSubmit={handleSubmit} className="relative">
-          <div className="flex items-end gap-2 sm:gap-3">
+          <div className="flex items-end gap-3">
             {/* File Upload Button */}
             <button
               type="button"
               onClick={() => setShowFileUpload(!showFileUpload)}
               disabled={isLoading}
-              className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-light-text-muted hover:text-primary-600 dark:text-dark-text-muted dark:hover:text-primary-400 hover:bg-light-surface dark:hover:bg-dark-surface rounded-xl sm:rounded-2xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-primary"
+              className="flex-shrink-0 w-12 h-12 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 shadow-md hover:shadow-lg hover:scale-105"
             >
-              <Paperclip className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform duration-200" />
+              <Paperclip className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
             </button>
 
             {/* Message Input Container */}
             <div className="flex-1 relative">
-              <div className="relative bg-white dark:bg-dark-surface rounded-xl sm:rounded-2xl border border-light-border dark:border-dark-border shadow-light dark:shadow-dark hover:shadow-light-md dark:hover:shadow-dark-md transition-all duration-200 focus-within:ring-2 focus-within:ring-primary-600 dark:focus-within:ring-primary-400 focus-within:border-transparent">
+              <div className="relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
                 <textarea
                   ref={textareaRef}
                   value={message}
@@ -196,9 +197,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                   onKeyDown={handleKeyDown}
                   placeholder="Ask about product strategy, roadmapping, user research, or any PM topic..."
                   disabled={isLoading}
-                  className="w-full px-4 sm:px-6 py-3 sm:py-4 pr-12 sm:pr-16 resize-none focus:outline-none bg-transparent text-light-text-primary dark:text-dark-text-primary placeholder-light-text-muted dark:placeholder-dark-text-muted disabled:opacity-50 transition-all duration-200 text-sm sm:text-base"
+                  className="relative w-full px-6 py-4 pr-16 resize-none focus:outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 transition-all duration-200 text-base"
                   rows={1}
-                  style={{ minHeight: '48px', maxHeight: '120px' }}
+                  style={{ minHeight: '56px', maxHeight: '120px' }}
                 />
                 
                 {/* Send/Stop Button */}
@@ -206,18 +207,18 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                   type={isLoading ? 'button' : 'submit'}
                   onClick={isLoading ? handleStop : undefined}
                   disabled={!isLoading && !message.trim()}
-                  className={`absolute right-2 sm:right-3 bottom-2 sm:bottom-3 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  className={`absolute right-3 bottom-3 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg ${
                     isLoading
-                      ? 'text-white bg-error-light hover:bg-error-light/90 dark:bg-error-dark dark:hover:bg-error-dark/90 shadow-light dark:shadow-dark hover:shadow-light-md dark:hover:shadow-dark-md focus:ring-error-light dark:focus:ring-error-dark focus:ring-offset-white dark:focus:ring-offset-dark-surface'
+                      ? 'text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105 focus:ring-red-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
                       : message.trim()
-                      ? 'text-white dark:text-dark-primary bg-primary-600 hover:bg-primary-700 dark:bg-primary-400 dark:hover:bg-primary-300 shadow-light dark:shadow-dark hover:shadow-light-md dark:hover:shadow-dark-md hover:scale-105 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-white dark:focus:ring-offset-dark-surface'
-                      : 'text-light-text-muted bg-light-surface dark:bg-dark-surface cursor-not-allowed'
+                      ? 'text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105 focus:ring-blue-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
+                      : 'text-gray-400 bg-gray-100 dark:bg-gray-700 cursor-not-allowed'
                   }`}
                 >
                   {isLoading ? (
-                    <Square className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />
+                    <Square className="w-4 h-4 fill-current" />
                   ) : (
-                    <Send className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <Send className="w-4 h-4" />
                   )}
                 </button>
               </div>
@@ -225,26 +226,33 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
           </div>
         </form>
 
-        {/* Quick suggestions - Mobile optimized */}
+        {/* Enhanced Quick suggestions */}
         {!isLoading && (
-          <div className="mt-3 sm:mt-4 flex flex-wrap gap-2">
-            {quickSuggestions.map((suggestion) => (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {quickSuggestions.map((suggestion, index) => (
               <button
                 key={suggestion}
                 onClick={() => setMessage(suggestion)}
                 disabled={isLoading}
-                className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-light-surface dark:bg-dark-surface text-light-text-secondary dark:text-dark-text-secondary rounded-full hover:bg-primary-100 dark:hover:bg-primary-900 hover:text-primary-700 dark:hover:text-primary-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border border-light-border dark:border-dark-border hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-light dark:hover:shadow-dark focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-primary"
+                className={`px-4 py-2 text-sm bg-gradient-to-r ${
+                  index === 0 ? 'from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200' :
+                  index === 1 ? 'from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 text-purple-700 border-purple-200' :
+                  index === 2 ? 'from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 text-green-700 border-green-200' :
+                  'from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 text-orange-700 border-orange-200'
+                } dark:from-gray-800 dark:to-gray-700 dark:hover:from-gray-700 dark:hover:to-gray-600 dark:text-gray-300 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border hover:shadow-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900`}
               >
+                <Sparkles className="w-3 h-3 inline mr-2" />
                 {suggestion}
               </button>
             ))}
           </div>
         )}
 
-        {/* Footer info */}
-        <p className="text-xs text-light-text-muted dark:text-dark-text-muted mt-3 sm:mt-4 text-center">
+        {/* Enhanced Footer info */}
+        <div className="flex items-center justify-center mt-4 text-xs text-gray-500 dark:text-gray-400">
+          <Zap className="w-3 h-3 mr-1" />
           AI can make mistakes. Always verify important information and strategic decisions.
-        </p>
+        </div>
       </div>
     </div>
   );

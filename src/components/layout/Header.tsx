@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Sun, Moon, Bot } from 'lucide-react';
+import { Menu, Sun, Moon, Bot, Sparkles } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useTheme } from '../../hooks/useTheme';
 import { useAppStore } from '../../stores/appStore';
@@ -9,42 +9,50 @@ export const Header: React.FC = () => {
   const { setSidebarOpen, sidebarOpen } = useAppStore();
 
   return (
-    <header className="h-14 sm:h-16 bg-white/90 dark:bg-dark-primary/90 backdrop-blur-xl border-b border-light-border dark:border-dark-border flex items-center justify-between px-4 lg:px-6 shadow-light dark:shadow-dark sticky top-0 z-40">
+    <header className="h-16 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between px-4 lg:px-6 shadow-lg sticky top-0 z-40">
       <div className="flex items-center space-x-3">
         <Button
           variant="ghost"
           size="sm"
           icon={Menu}
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="lg:hidden hover:bg-light-surface dark:hover:bg-dark-surface rounded-lg p-2 w-9 h-9 text-light-text-secondary dark:text-dark-text-secondary hover:text-primary-600 dark:hover:text-primary-400"
+          className="lg:hidden hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl p-2 w-10 h-10 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
         />
         
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 bg-primary-600 dark:bg-primary-400 rounded-lg sm:rounded-xl flex items-center justify-center shadow-light dark:shadow-dark">
-            <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white dark:text-dark-primary" />
+        <div className="flex items-center space-x-3">
+          <div className="relative">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+              <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-md">
+              <Sparkles className="w-2 h-2 text-white" />
+            </div>
           </div>
           <div className="hidden xs:block sm:block">
-            <h1 className="text-sm sm:text-lg font-bold text-light-text-primary dark:text-dark-text-primary">
+            <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
               Product Manager AI
             </h1>
+            <p className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
+              Senior PM Assistant
+            </p>
           </div>
           <div className="xs:hidden">
-            <h1 className="text-sm font-bold text-light-text-primary dark:text-dark-text-primary">
+            <h1 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
               PM AI
             </h1>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center">
+      <div className="flex items-center space-x-2">
         <button
           onClick={toggleTheme}
-          className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg sm:rounded-xl bg-light-surface dark:bg-dark-surface hover:bg-primary-100 dark:hover:bg-primary-900 transition-all duration-200 text-light-text-secondary dark:text-dark-text-secondary hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-600 dark:focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-primary"
+          className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 shadow-md hover:shadow-lg hover:scale-105"
         >
           {theme === 'light' ? (
-            <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Moon className="w-5 h-5 sm:w-6 sm:h-6" />
           ) : (
-            <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Sun className="w-5 h-5 sm:w-6 sm:h-6" />
           )}
         </button>
       </div>
