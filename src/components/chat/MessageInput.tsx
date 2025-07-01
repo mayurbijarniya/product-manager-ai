@@ -226,9 +226,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
           </div>
         </form>
 
-        {/* Compact Quick suggestions */}
+        {/* Quick suggestions - HIDDEN on mobile (sm and below), visible on tablet+ */}
         {!isLoading && (
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-3 hidden md:flex flex-wrap gap-2">
             {quickSuggestions.map((suggestion, index) => (
               <button
                 key={suggestion}
