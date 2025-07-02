@@ -17,7 +17,7 @@ interface GeminiResponse {
 export class GeminiService {
   private static instance: GeminiService;
   private apiKey: string;
-  private baseUrl: string = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+  private baseUrl: string = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
   private constructor() {
     // Get API key from environment variable with fallback
