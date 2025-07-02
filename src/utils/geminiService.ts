@@ -17,7 +17,7 @@ interface GeminiResponse {
 export class GeminiService {
   private static instance: GeminiService;
   private apiKey: string;
-  private baseUrl: string = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+  private baseUrl: string = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
 
   private constructor() {
     // Get API key from environment variable with fallback
@@ -238,8 +238,8 @@ Remember: You're having an ongoing conversation, not answering isolated question
         });
       }
 
-      // Add conversation history (last 6 messages to manage token usage and prevent context overflow)
-      const recentHistory = conversationHistory.slice(-6);
+      // Add conversation history (last 8 messages to manage token usage and prevent context overflow)
+      const recentHistory = conversationHistory.slice(-8);
       recentHistory.forEach(msg => {
         if (msg.role === 'user') {
           contents.push({
@@ -276,10 +276,10 @@ IMPORTANT: Please provide a COMPLETE table with ALL rows filled out. Do not stop
       const requestBody = {
         contents: contents,
         generationConfig: {
-          temperature: 0.1,
-          topK: 10,
-          topP: 0.7,
-          maxOutputTokens: 1000,
+          temperature: 2.0,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 8192,
           candidateCount: 1,
           stopSequences: [], // Remove any stop sequences that might interrupt tables
         },
@@ -369,7 +369,7 @@ IMPORTANT: Please provide a COMPLETE table with ALL rows filled out. Do not stop
         let currentResponse = '';
         
         // Adjust streaming speed based on content length
-        const streamDelay = 15;
+        const streamDelay = 12;
         
         for (let i = 0; i < words.length; i++) {
           // Check if request was aborted during streaming
