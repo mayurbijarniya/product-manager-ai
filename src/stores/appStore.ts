@@ -172,6 +172,25 @@ export const useAppStore = create<AppState>()(
       
       setCurrentConversation: (id) => set({ currentConversationId: id }),
       
+      setCurrentConversation: (id) => {
+        set((state) => {
+          // Initialize conversation state if it doesn't exist
+          const newConversationStates = { ...state.conversationStates };
+          if (id && !newConversationStates[id]) {
+            newConversationStates[id] = {
+              isLoading: false,
+              streamingMessage: null,
+              abortController: null,
+            };
+          }
+          
+          return {
+            currentConversationId: id,
+            conversationStates: newConversationStates,
+          };
+        });
+      },
+      
       addMessage: (conversationId, message) => {
         const newMessage: Message = {
           ...message,

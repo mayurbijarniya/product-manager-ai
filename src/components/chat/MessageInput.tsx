@@ -30,13 +30,33 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   // Auto-trigger AI response when loading state changes and there's a new user message
   useEffect(() => {
     const handleAIResponse = async () => {
+      // Only proceed if this conversation is loading
       if (!isLoading) return;
       
       const conversation = getCurrentConversation();
-      if (!conversation || conversation.id !== conversationId || conversation.messages.length === 0) return;
+      // Ensure we're working with the correct conversation
+      if (!conversation || conversation.id !== conversationId) return;
+      
+      // Check if there are messages and the last one is from user
+      if (conversation.messages.length === 0) return;
       
       const lastMessage = conversation.messages[conversation.messages.length - 1];
+      
+      // Only respond to user messages, and avoid duplicate responses
       if (lastMessage.role !== 'user') return;
+      
+      // Check if there's already an assistant response after this user message
+      // This prevents duplicate responses when switching conversations
+      const hasSubsequentAssistantMessage = conversation.messages.length > 1 && 
+        conversation.messages.some((msg, index) => 
+          index > conversation.messages.indexOf(lastMessage) && msg.role === 'assistant'
+        );
+      
+      if (hasSubsequentAssistantMessage) {
+        // Clear loading state if there's already a response
+        setConversationLoading(conversationId, false);
+        return;
+      }
 
       // Create abort controller for this request
       const abortController = new AbortController();
@@ -96,7 +116,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     };
 
     handleAIResponse();
-  }, [isLoading, conversationId, getCurrentConversation, addMessage, setConversationLoading, setConversationStreaming, setConversationAbortController]);
+  }, [isLoading, conversationId]); // Simplified dependencies to prevent unnecessary re-runs
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
