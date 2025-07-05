@@ -13,9 +13,19 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   const [message, setMessage] = useState('');
   const [showFileUpload, setShowFileUpload] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
   
-  const { addMessage, setIsLoading, setStreamingMessage, isLoading, getCurrentConversation } = useAppStore();
+  const { 
+    addMessage, 
+    setConversationLoading, 
+    setConversationStreaming, 
+    setConversationAbortController,
+    stopConversationAI,
+    getConversationState,
+    getCurrentConversation 
+  } = useAppStore();
+  
+  // Get conversation-specific state
+  const { isLoading, streamingMessage } = getConversationState(conversationId);
 
   // Auto-trigger AI response when loading state changes and there's a new user message
   useEffect(() => {
@@ -23,13 +33,14 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
       if (!isLoading) return;
       
       const conversation = getCurrentConversation();
-      if (!conversation || conversation.messages.length === 0) return;
+      if (!conversation || conversation.id !== conversationId || conversation.messages.length === 0) return;
       
       const lastMessage = conversation.messages[conversation.messages.length - 1];
       if (lastMessage.role !== 'user') return;
 
       // Create abort controller for this request
-      abortControllerRef.current = new AbortController();
+      const abortController = new AbortController();
+      setConversationAbortController(conversationId, abortController);
 
       try {
         // Get conversation history for context (excluding the last message since it's the current one)
@@ -44,17 +55,17 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
           conversationHistory,
           (streamContent) => {
             // Check if request was aborted
-            if (abortControllerRef.current?.signal.aborted) return;
-            setStreamingMessage(streamContent);
+            if (abortController.signal.aborted) return;
+            setConversationStreaming(conversationId, streamContent);
           },
-          abortControllerRef.current.signal // Pass abort signal
+          abortController.signal // Pass abort signal
         );
 
         // Check if request was aborted before adding final message
-        if (abortControllerRef.current?.signal.aborted) return;
+        if (abortController.signal.aborted) return;
 
         // Clear streaming and add final message
-        setStreamingMessage(null);
+        setConversationStreaming(conversationId, null);
         addMessage(conversationId, {
           content: response,
           role: 'assistant',
@@ -72,20 +83,20 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
         }
         
         console.error('Error sending message:', error);
-        setStreamingMessage(null);
+        setConversationStreaming(conversationId, null);
         addMessage(conversationId, {
           content: 'I apologize, but I encountered an error processing your request. Please check your connection and try again.',
           role: 'assistant',
         });
       } finally {
-        setIsLoading(false);
-        setStreamingMessage(null);
-        abortControllerRef.current = null;
+        setConversationLoading(conversationId, false);
+        setConversationStreaming(conversationId, null);
+        setConversationAbortController(conversationId, null);
       }
     };
 
     handleAIResponse();
-  }, [isLoading, conversationId, getCurrentConversation, addMessage, setIsLoading, setStreamingMessage]);
+  }, [isLoading, conversationId, getCurrentConversation, addMessage, setConversationLoading, setConversationStreaming, setConversationAbortController]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,24 +117,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     });
 
     // Set loading state (this will trigger the AI response via useEffect)
-    setIsLoading(true);
+    setConversationLoading(conversationId, true);
   };
 
   const handleStop = () => {
-    console.log('Stop button clicked - stopping AI response');
-    
-    // Abort the current request
-    if (abortControllerRef.current) {
-      console.log('Aborting current request');
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-    
-    // Immediately clear loading and streaming states
-    setIsLoading(false);
-    setStreamingMessage(null);
-    
-    console.log('AI response stopped successfully');
+    console.log(`Stop button clicked for conversation ${conversationId}`);
+    stopConversationAI(conversationId);
+    console.log(`AI response stopped for conversation ${conversationId}`);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

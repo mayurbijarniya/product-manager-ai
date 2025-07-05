@@ -12,9 +12,12 @@ interface AppState {
   conversations: Conversation[];
   currentConversationId: string | null;
   
-  // Messages
-  isLoading: boolean;
-  streamingMessage: string | null;
+  // Per-conversation AI state
+  conversationStates: Record<string, {
+    isLoading: boolean;
+    streamingMessage: string | null;
+    abortController: AbortController | null;
+  }>;
   
   // Files
   uploadedFiles: FileData[];
@@ -34,8 +37,13 @@ interface AppState {
   // Message actions
   addMessage: (conversationId: string, message: Omit<Message, 'id' | 'timestamp'>) => void;
   updateMessage: (conversationId: string, messageId: string, updates: Partial<Message>) => void;
-  setIsLoading: (loading: boolean) => void;
-  setStreamingMessage: (content: string | null) => void;
+  
+  // Per-conversation AI state actions
+  setConversationLoading: (conversationId: string, loading: boolean) => void;
+  setConversationStreaming: (conversationId: string, content: string | null) => void;
+  setConversationAbortController: (conversationId: string, controller: AbortController | null) => void;
+  stopConversationAI: (conversationId: string) => void;
+  getConversationState: (conversationId: string) => { isLoading: boolean; streamingMessage: string | null; };
   
   // File actions
   addFile: (file: FileData) => void;
@@ -82,8 +90,7 @@ export const useAppStore = create<AppState>()(
       selectedFeature: null,
       conversations: [],
       currentConversationId: null,
-      isLoading: false,
-      streamingMessage: null,
+      conversationStates: {},
       uploadedFiles: [],
       
       // Actions
@@ -105,6 +112,15 @@ export const useAppStore = create<AppState>()(
           conversations: [newConversation, ...state.conversations],
           currentConversationId: id,
           selectedFeature: null, // Clear selected feature when creating new conversation
+          // Initialize conversation state
+          conversationStates: {
+            ...state.conversationStates,
+            [id]: {
+              isLoading: false,
+              streamingMessage: null,
+              abortController: null,
+            }
+          }
         }));
         
         return id;
@@ -122,16 +138,26 @@ export const useAppStore = create<AppState>()(
       
       deleteConversation: (id) => {
         set((state) => ({
-          conversations: state.conversations.filter((conv) => conv.id !== id),
-          currentConversationId: state.currentConversationId === id ? null : state.currentConversationId,
-        }));
+          // Clean up conversation state
+          const newConversationStates = { ...state.conversationStates };
+          if (newConversationStates[id]?.abortController) {
+            newConversationStates[id].abortController.abort();
+          }
+          delete newConversationStates[id];
+          
+          return {
+            conversations: state.conversations.filter((conv) => conv.id !== id),
+            currentConversationId: state.currentConversationId === id ? null : state.currentConversationId,
+            conversationStates: newConversationStates,
+          };
+        });
       },
 
       clearAllConversations: () => {
-        set({
           conversations: [],
           currentConversationId: null,
-        });
+          conversationStates: {},
+        }));
       },
       
       setCurrentConversation: (id) => set({ currentConversationId: id }),
@@ -176,8 +202,72 @@ export const useAppStore = create<AppState>()(
         }));
       },
       
-      setIsLoading: (loading) => set({ isLoading: loading }),
-      setStreamingMessage: (content) => set({ streamingMessage: content }),
+      // Per-conversation AI state management
+      setConversationLoading: (conversationId, loading) => {
+        set((state) => ({
+          conversationStates: {
+            ...state.conversationStates,
+            [conversationId]: {
+              ...state.conversationStates[conversationId],
+              isLoading: loading,
+            }
+          }
+        }));
+      },
+      
+      setConversationStreaming: (conversationId, content) => {
+        set((state) => ({
+          conversationStates: {
+            ...state.conversationStates,
+            [conversationId]: {
+              ...state.conversationStates[conversationId],
+              streamingMessage: content,
+            }
+          }
+        }));
+      },
+      
+      setConversationAbortController: (conversationId, controller) => {
+        set((state) => ({
+          conversationStates: {
+            ...state.conversationStates,
+            [conversationId]: {
+              ...state.conversationStates[conversationId],
+              abortController: controller,
+            }
+          }
+        }));
+      },
+      
+      stopConversationAI: (conversationId) => {
+        set((state) => {
+          const conversationState = state.conversationStates[conversationId];
+          if (conversationState?.abortController) {
+            conversationState.abortController.abort();
+          }
+          
+          return {
+            conversationStates: {
+              ...state.conversationStates,
+              [conversationId]: {
+                ...conversationState,
+                isLoading: false,
+                streamingMessage: null,
+                abortController: null,
+              }
+            }
+          };
+        });
+      },
+      
+      getConversationState: (conversationId) => {
+        const state = get();
+        const conversationState = state.conversationStates[conversationId];
+        return {
+          isLoading: conversationState?.isLoading || false,
+          streamingMessage: conversationState?.streamingMessage || null,
+        };
+      },
       
       addFile: (file) => {
         set((state) => ({
@@ -211,6 +301,7 @@ export const useAppStore = create<AppState>()(
         conversations: state.conversations,
         theme: state.theme,
         sidebarOpen: state.sidebarOpen,
+        // Don't persist conversation states (they should reset on app restart)
       }),
     }
   )

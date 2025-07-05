@@ -9,7 +9,8 @@ interface MessageListProps {
 }
 
 export const MessageList: React.FC<MessageListProps> = ({ conversation }) => {
-  const { isLoading, streamingMessage } = useAppStore();
+  const { getConversationState } = useAppStore();
+  const { isLoading, streamingMessage } = getConversationState(conversation.id);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
