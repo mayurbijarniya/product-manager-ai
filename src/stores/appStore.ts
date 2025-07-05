@@ -170,8 +170,6 @@ export const useAppStore = create<AppState>()(
         });
       },
       
-      setCurrentConversation: (id) => set({ currentConversationId: id }),
-      
       setCurrentConversation: (id) => {
         set((state) => {
           // Initialize conversation state if it doesn't exist
@@ -190,6 +188,7 @@ export const useAppStore = create<AppState>()(
           };
         });
       },
+      
       
       addMessage: (conversationId, message) => {
         const newMessage: Message = {

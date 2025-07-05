@@ -45,14 +45,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
       // Only respond to user messages, and avoid duplicate responses
       if (lastMessage.role !== 'user') return;
       
-      // Check if there's already an assistant response after this user message
-      // This prevents duplicate responses when switching conversations
-      const hasSubsequentAssistantMessage = conversation.messages.length > 1 && 
-        conversation.messages.some((msg, index) => 
-          index > conversation.messages.indexOf(lastMessage) && msg.role === 'assistant'
-        );
+      // Check if the last user message already has an assistant response
+      // Look for the next message after the last user message
+      const lastUserMessageIndex = conversation.messages.length - 1;
+      const nextMessage = conversation.messages[lastUserMessageIndex + 1];
+      const hasAssistantResponse = nextMessage && nextMessage.role === 'assistant';
       
-      if (hasSubsequentAssistantMessage) {
+      if (hasAssistantResponse) {
         // Clear loading state if there's already a response
         setConversationLoading(conversationId, false);
         return;
