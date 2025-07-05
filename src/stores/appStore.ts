@@ -137,7 +137,7 @@ export const useAppStore = create<AppState>()(
       },
       
       deleteConversation: (id) => {
-        set((state) => ({
+        set((state) => {
           // Clean up conversation state
           const newConversationStates = { ...state.conversationStates };
           if (newConversationStates[id]?.abortController) {
@@ -154,10 +154,20 @@ export const useAppStore = create<AppState>()(
       },
 
       clearAllConversations: () => {
-          conversations: [],
-          currentConversationId: null,
-          conversationStates: {},
-        }));
+        set((state) => {
+          // Clean up all conversation states
+          Object.values(state.conversationStates).forEach(convState => {
+            if (convState?.abortController) {
+              convState.abortController.abort();
+            }
+          });
+          
+          return {
+            conversations: [],
+            currentConversationId: null,
+            conversationStates: {},
+          };
+        });
       },
       
       setCurrentConversation: (id) => set({ currentConversationId: id }),
