@@ -374,6 +374,7 @@ IMPORTANT: Please provide a COMPLETE table with ALL rows filled out. Do not stop
         for (let i = 0; i < words.length; i++) {
           // Check if request was aborted during streaming
           if (abortSignal?.aborted) {
+            console.log('Streaming aborted during word processing');
             throw new Error('Request aborted');
           }
           
@@ -386,6 +387,7 @@ IMPORTANT: Please provide a COMPLETE table with ALL rows filled out. Do not stop
       return responseText;
     } catch (error) {
       if (error instanceof Error && error.message === 'Request aborted') {
+        console.log('Request was properly aborted');
         throw error; // Re-throw abort errors
       }
       

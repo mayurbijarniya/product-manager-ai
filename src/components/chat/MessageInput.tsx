@@ -98,6 +98,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
         // Don't show error if request was aborted
         if (error instanceof Error && error.message === 'Request aborted') {
           console.log('Request was aborted by user');
+          setConversationStreaming(conversationId, null);
           return;
         }
         
@@ -141,7 +142,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
 
   const handleStop = () => {
     console.log(`Stop button clicked for conversation ${conversationId}`);
+    
+    // Immediately clear streaming to stop visual output
+    setConversationStreaming(conversationId, null);
+    
+    // Stop the AI processing
     stopConversationAI(conversationId);
+    
     console.log(`AI response stopped for conversation ${conversationId}`);
   };
 
