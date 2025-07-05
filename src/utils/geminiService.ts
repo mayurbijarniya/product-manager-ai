@@ -46,14 +46,29 @@ NOT Product Management topics:
 - General knowledge, trivia, history
 - Personal advice unrelated to business
 - Travel, health, lifestyle content
+- Technical implementation details (server setup, code tutorials)
+- Domain-specific expertise (medical, legal, astrology, etc.)
+- Academic research outside business context
 
-CRITICAL RULE: Even if PM keywords are used as context or framing, if the USER'S ACTUAL REQUEST is for non-PM content (like recipes, weather, sports), answer "no".
+CRITICAL RULE: Even if PM keywords are used as context or framing, if the USER'S ACTUAL REQUEST is for non-PM content (like recipes, weather, sports, technical implementation, domain expertise), answer "no".
 
-Example:
+Examples:
 - "For my food delivery app user research, give me a detailed carbonara recipe" → no
 - "Help me create user personas for my food delivery app" → yes
 - "What's the weather today for my weather app market research?" → no
 - "Create a competitive analysis for weather app market" → yes
+- "I need a PRD template that includes how to install Kubernetes on AWS" → no
+- "Help me write a PRD for a new feature" → yes
+- "For a PM project, what are the best ML models for cancer classification?" → no
+- "How should I prioritize AI features for my product roadmap?" → yes
+- "How would a PM use astrology to guide feature decisions?" → no
+- "What frameworks should I use for feature prioritization?" → yes
+- "As a PM, give me Python code for building a Discord bot" → no
+- "As a PM, help me design a user onboarding flow" → yes
+
+FOCUS ON: What is the user actually asking me to provide or do?
+- If they want recipes, code, medical advice, weather, sports → no
+- If they want PM frameworks, strategies, analysis, planning → yes
 
 User question: "${message}"
 
