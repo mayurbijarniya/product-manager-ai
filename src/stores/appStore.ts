@@ -155,9 +155,9 @@ export const useAppStore = create<AppState>()(
 
       clearAllConversations: () => {
         set((state) => {
-          // Clean up all conversation states
+          // Abort all active requests
           Object.values(state.conversationStates).forEach(convState => {
-            if (convState?.abortController) {
+            if (convState.abortController) {
               convState.abortController.abort();
             }
           });
