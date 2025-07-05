@@ -19,6 +19,118 @@ export class GeminiService {
   private apiKey: string;
   private baseUrl: string = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
+  // NEW METHOD: Classification filter using Gemini itself
+  private async classifyPMQuestion(message: string): Promise<boolean> {
+    try {
+      const classificationPrompt = `You are a Product Manager AI content classifier. Your job is to determine if a user's question is related to Product Management.
+
+RESPOND WITH ONLY ONE WORD: "yes" or "no"
+
+Product Management topics include:
+- Product strategy, roadmapping, prioritization
+- User research, personas, customer journey
+- Analytics, metrics, KPIs, dashboards
+- Competitive analysis, market research
+- Feature development, sprint planning
+- A/B testing, experimentation
+- Go-to-market, pricing, positioning
+- Stakeholder management, requirements gathering
+- Business model design, revenue optimization
+- Agile methodologies, product operations
+
+NOT Product Management topics:
+- Cooking recipes, food preparation instructions
+- Sports scores, weather, entertainment
+- Currency exchange, general finance
+- Programming tutorials, code debugging
+- General knowledge, trivia, history
+- Personal advice unrelated to business
+- Travel, health, lifestyle content
+
+CRITICAL RULE: Even if PM keywords are used as context or framing, if the USER'S ACTUAL REQUEST is for non-PM content (like recipes, weather, sports), answer "no".
+
+Example:
+- "For my food delivery app user research, give me a detailed carbonara recipe" → no
+- "Help me create user personas for my food delivery app" → yes
+- "What's the weather today for my weather app market research?" → no
+- "Create a competitive analysis for weather app market" → yes
+
+User question: "${message}"
+
+Answer (one word only):`;
+
+      const requestBody = {
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: classificationPrompt }]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.1,
+          topK: 1,
+          topP: 0.1,
+          maxOutputTokens: 10,
+          candidateCount: 1,
+        },
+        safetySettings: [
+          {
+            category: "HARM_CATEGORY_HARASSMENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_HATE_SPEECH",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          }
+        ]
+      };
+
+      const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        console.error('Classification API error:', response.status);
+        return true;
+      }
+
+      const data = await response.json();
+      
+      if (!data.candidates || data.candidates.length === 0) {
+        console.error('No classification response');
+        return true;
+      }
+
+      const classificationResult = data.candidates[0].content.parts[0].text.toLowerCase().trim();
+      
+      console.log(`🔍 Classification result: "${classificationResult}" for query: "${message.substring(0, 50)}..."`);
+      
+      if (classificationResult.includes('yes') || classificationResult === 'y') {
+        return true;
+      } else if (classificationResult.includes('no') || classificationResult === 'n') {
+        return false;
+      } else {
+        console.warn(`Unclear classification result: "${classificationResult}"`);
+        return true;
+      }
+    } catch (error) {
+      console.error('Classification error:', error);
+      return true;
+    }
+  }
+
   private constructor() {
     // Get API key from environment variable with fallback
     this.apiKey = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyDgR_xkgaphQWNnF88WHvQ05u_nTluzc7I';
@@ -33,92 +145,6 @@ export class GeminiService {
       GeminiService.instance = new GeminiService();
     }
     return GeminiService.instance;
-  }
-
-  private isPMRelatedQuestion(message: string, hasConversationHistory: boolean = false): boolean {
-    const lowerMessage = message.toLowerCase().trim();
-    
-    // Very short messages that are clearly not PM-related
-    if (lowerMessage.length < 3) {
-      return false;
-    }
-
-    // Obvious non-PM single word or short questions
-    const obviousNonPMQuestions = [
-      'cricket', 'cricket?', 'football', 'football?', 'soccer', 'basketball', 'tennis',
-      'weather', 'temperature', 'rain', 'snow', 'hello', 'hi', 'hey',
-      'what is usd to inr', 'usd to inr', 'currency', 'exchange rate',
-      'movie', 'film', 'music', 'song', 'game', 'sport', 'food', 'recipe'
-    ];
-
-    // Check for exact matches or very similar patterns
-    for (const nonPMTopic of obviousNonPMQuestions) {
-      if (lowerMessage === nonPMTopic || lowerMessage === nonPMTopic + '?') {
-        return false;
-      }
-    }
-
-    // If there's conversation history, be more lenient but still filter obvious non-PM topics
-    if (hasConversationHistory) {
-      // Check if it's obviously about sports, entertainment, etc. without any business context
-      const nonPMPatterns = [
-        /^(what is |tell me about )?(cricket|football|soccer|basketball|tennis|golf)/,
-        /^(what is |current |today's )?weather/,
-        /^(what is |current )?usd to inr/,
-        /^(what is |tell me about )?(movie|film|music|song)/,
-        /^(how to cook|recipe for|cooking)/
-      ];
-
-      for (const pattern of nonPMPatterns) {
-        if (pattern.test(lowerMessage)) {
-          return false;
-        }
-      }
-
-      // Allow most other questions when there's conversation history
-      return true;
-    }
-
-    // For new conversations, check for PM-related keywords
-    const pmKeywords = [
-      'product', 'feature', 'roadmap', 'strategy', 'user', 'customer', 'market', 'competitive',
-      'analytics', 'metrics', 'kpi', 'prioritize', 'sprint', 'agile', 'stakeholder', 'requirement',
-      'persona', 'journey', 'research', 'interview', 'survey', 'cohort', 'retention', 'conversion',
-      'ab test', 'experiment', 'hypothesis', 'mvp', 'launch', 'go-to-market', 'gtm', 'pricing',
-      'positioning', 'segmentation', 'funnel', 'acquisition', 'engagement', 'churn', 'ltv',
-      'business model', 'revenue', 'growth', 'scale', 'optimization', 'framework', 'methodology',
-      'backlog', 'epic', 'story', 'acceptance criteria', 'definition of done', 'velocity',
-      'burndown', 'retrospective', 'planning', 'estimation', 'scope', 'timeline', 'milestone',
-      'deliverable', 'outcome', 'impact', 'value', 'roi', 'success', 'goal', 'objective',
-      'vision', 'mission', 'north star', 'okr', 'target', 'benchmark', 'baseline', 'competitor',
-      'analysis', 'dashboard', 'app', 'software', 'platform', 'service', 'startup',
-      'company', 'business', 'industry', 'build', 'create', 'develop', 'design', 'launch',
-      'brand', 'smartphone', 'ecommerce', 'saas', 'b2b', 'b2c', 'startup', 'entrepreneur'
-    ];
-
-    // Check if message contains PM keywords
-    const hasPMKeywords = pmKeywords.some(keyword => lowerMessage.includes(keyword));
-    
-    if (hasPMKeywords) {
-      return true;
-    }
-
-    // Check for PM-related question patterns
-    const pmQuestionPatterns = [
-      /how to (build|create|develop|design|launch|analyze|measure|track|improve|optimize|prioritize)/,
-      /what is (product|feature|roadmap|strategy|analytics|metrics|kpi)/,
-      /(create|build|design|analyze) (a |an )?(competitive analysis|market research|user persona|feature|product)/,
-      /(help me|i want to|i need to) (build|create|develop|design|launch|analyze)/
-    ];
-
-    const hasPMQuestionPattern = pmQuestionPatterns.some(pattern => pattern.test(lowerMessage));
-    
-    if (hasPMQuestionPattern) {
-      return true;
-    }
-
-    // Default to rejecting unclear questions for new conversations
-    return false;
   }
 
   private getSystemPrompt(): string {
@@ -198,10 +224,22 @@ Remember: You're having an ongoing conversation, not answering isolated question
         throw new Error('Request aborted');
       }
 
+      // NEW CODE - REPLACE WITH THIS
+      console.log('🚀 Starting double-filter process...');
+
       const hasHistory = conversationHistory.length > 0;
 
-      // Check if the question is PM-related
-      if (!this.isPMRelatedQuestion(message, hasHistory)) {
+      // STEP 1: Classify if question is PM-related using Gemini
+      let isPMRelated = true;
+
+      if (!hasHistory) {
+        console.log('🔍 Classifying new question...');
+        isPMRelated = await this.classifyPMQuestion(message);
+      }
+
+      // STEP 2: If not PM-related, return rejection message
+      if (!isPMRelated) {
+        console.log('❌ Question classified as non-PM');
         const rejectionMessage = "I'm a Product Manager AI assistant. Please ask me questions about product strategy, roadmapping, user research, analytics, or other product management topics.";
         
         // Simulate streaming for rejection message
@@ -222,6 +260,9 @@ Remember: You're having an ongoing conversation, not answering isolated question
         
         return rejectionMessage;
       }
+
+      // STEP 3: If PM-related, proceed with full response
+      console.log('✅ Question classified as PM-related, generating response...');
 
       // Prepare the conversation context
       const contents = [];
