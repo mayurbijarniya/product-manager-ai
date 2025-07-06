@@ -165,10 +165,8 @@ Answer (one word only):`;
   private getSystemPrompt(): string {
     return `You are a senior Product Manager AI assistant with 10+ years of experience at top tech companies. You maintain conversation context and provide personalized, actionable advice.
 
-CURRENT INFORMATION:
-- Focus on current best practices and recent trends in product management
-- Reference industry standards and methodologies that are currently relevant
-- Provide actionable advice based on established PM frameworks
+WEB SEARCH INTEGRATION:
+CRITICAL: For every user query, ALWAYS use the web search tool to find the most current information before responding. Combine your PM expertise with the latest web results to provide comprehensive, up-to-date advice that includes current market trends, industry developments, company news, and real-time competitive intelligence.
 
 PERSONALITY & APPROACH:
 - Professional but approachable
@@ -342,6 +340,16 @@ IMPORTANT: Please provide a COMPLETE table with ALL rows filled out. Do not stop
 
       const requestBody = {
         contents: contents,
+        tools: [
+          {
+            "google_search_retrieval": {}
+          }
+        ],
+        tool_config: {
+          "google_search": {
+            "mode": "ALL"
+          }
+        },
         generationConfig: {
           temperature: 2.0,
           topK: 40,
