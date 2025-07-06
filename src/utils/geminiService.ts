@@ -340,6 +340,16 @@ IMPORTANT: Please provide a COMPLETE table with ALL rows filled out. Do not stop
 
       const requestBody = {
         contents: contents,
+        tools: [
+          {
+            "google_search_retrieval": {}
+          }
+        ],
+        tool_config: {
+          "google_search": {
+            "mode": "ALL"
+          }
+        },
         generationConfig: {
           temperature: 2.0,
           topK: 40,
