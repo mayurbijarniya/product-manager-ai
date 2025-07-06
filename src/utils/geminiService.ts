@@ -17,7 +17,7 @@ interface GeminiResponse {
 export class GeminiService {
   private static instance: GeminiService;
   private apiKey: string;
-  private baseUrl: string = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent';
+  private baseUrl: string = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
   // NEW METHOD: Classification filter using Gemini itself
   private async classifyPMQuestion(message: string): Promise<boolean> {
@@ -165,9 +165,6 @@ Answer (one word only):`;
   private getSystemPrompt(): string {
     return `You are a senior Product Manager AI assistant with 10+ years of experience at top tech companies. You maintain conversation context and provide personalized, actionable advice.
 
-WEB SEARCH INTEGRATION:
-CRITICAL: For every user query, ALWAYS use the web search tool to find the most current information before responding. Combine your PM expertise with the latest web results to provide comprehensive, up-to-date advice that includes current market trends, industry developments, company news, and real-time competitive intelligence.
-
 PERSONALITY & APPROACH:
 - Professional but approachable
 - Data-driven and strategic
@@ -242,12 +239,6 @@ Remember: You're having an ongoing conversation, not answering isolated question
         throw new Error('Request aborted');
       }
 
-      // Enhanced "Thinking Mode" with web search indication
-      if (onStream) {
-        const thinkingMessage = "Searching the web and analyzing... 🌐🧠";
-        onStream(thinkingMessage);
-      }
-
       // NEW CODE - REPLACE WITH THIS
       console.log('🚀 Starting double-filter process...');
 
@@ -299,7 +290,7 @@ Remember: You're having an ongoing conversation, not answering isolated question
         });
         contents.push({
           role: 'model',
-          parts: [{ text: "Hello! I'm your senior Product Manager AI assistant with real-time web search capabilities. I'll search for the latest information to provide you with current, actionable PM insights. What product challenge can I help you tackle today?" }]
+          parts: [{ text: "Hello! I'm your senior Product Manager AI assistant. I'm here to help you with product strategy, roadmapping, user research, analytics, and all aspects of product management. What product challenge can I help you tackle today?" }]
         });
       }
 
@@ -340,16 +331,6 @@ IMPORTANT: Please provide a COMPLETE table with ALL rows filled out. Do not stop
 
       const requestBody = {
         contents: contents,
-        tools: [
-          {
-            "google_search_retrieval": {}
-          }
-        ],
-        tool_config: {
-          "google_search": {
-            "mode": "ALL"
-          }
-        },
         generationConfig: {
           temperature: 2.0,
           topK: 40,
