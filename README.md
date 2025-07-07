@@ -59,4 +59,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**Made with ❤️ for Product Managers**
+**Made with ❤️  for Product Managers**
