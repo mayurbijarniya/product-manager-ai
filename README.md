@@ -101,4 +101,23 @@ src/
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Support
+
+If you encounter any issues or have questions, please [open an issue](https://github.com/yourusername/product-manager-ai/issues) on GitHub.
+
+## Acknowledgments
+
+- Built with [React](https://reactjs.org/) and [TypeScript](https://www.typescriptlang.org/)
+- Powered by [Google Gemini AI](https://ai.google.dev/)
+- UI components styled with [Tailwind CSS](https://tailwindcss.com/)
+- Icons from [Lucide React](https://lucide.dev/)
