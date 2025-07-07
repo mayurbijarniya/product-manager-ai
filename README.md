@@ -4,11 +4,15 @@
 
 ## ✨ Features
 
-- 🤖 **AI Chat** - Senior PM assistant with 10+ years experience
-- 📊 **Data Analysis** - Upload CSV, Excel, JSON files for insights
-- 🎯 **PM Frameworks** - RICE scoring, competitive analysis, user research
-- 🌙 **Dark Mode** - Beautiful light/dark theme support
-- 📱 **Responsive** - Works perfectly on mobile and desktop
+- 🤖 **Senior PM AI Assistant** - Strategic insights, roadmapping, and data-driven recommendations
+- 🎯 **Feature Prioritization** - RICE scoring framework with automated analysis
+- 🏆 **Competitive Analysis** - Market positioning and strategic recommendations  
+- 👥 **User Research Tools** - Persona development and interview guide generation
+- 📊 **KPI Dashboard Design** - Metrics frameworks and analytics strategy
+- 📁 **File Analysis** - Upload CSV/Excel/JSON for product insights
+- 💬 **Conversation Memory** - Persistent chat history across sessions
+- 🌙 **Dark/Light Mode** - Professional UI with theme switching
+- 📱 **Mobile Optimized** - Responsive design for all devices
 
 ## 🚀 Quick Start
 
