@@ -53,10 +53,10 @@ export const ChatContainer: React.FC = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-3">
                     Competitive analysis, market positioning, roadmapping, and business model innovation
                   </p>
-                  <div className="flex items-center text-blue-600 dark:text-blue-400 text-xs font-medium">
+                  {/*<div className="flex items-center text-blue-600 dark:text-blue-400 text-xs font-medium">
                     <Rocket className="w-3 h-3 mr-1.5" />
                     Get Started
-                  </div>
+                  </div>*/}
                 </div>
                 
                 <div className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-5 rounded-xl border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl hover:shadow-purple-500/10 dark:hover:shadow-purple-400/10 transition-all duration-300 hover:-translate-y-1 hover:border-purple-200 dark:hover:border-purple-700 cursor-pointer">
@@ -69,10 +69,10 @@ export const ChatContainer: React.FC = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-3">
                     Persona development, journey mapping, interview guides, and behavioral analysis
                   </p>
-                  <div className="flex items-center text-purple-600 dark:text-purple-400 text-xs font-medium">
+                  {/*<div className="flex items-center text-purple-600 dark:text-purple-400 text-xs font-medium">
                     <Rocket className="w-3 h-3 mr-1.5" />
                     Get Started
-                  </div>
+                  </div>*/}
                 </div>
                 
                 <div className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-5 rounded-xl border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl hover:shadow-green-500/10 dark:hover:shadow-green-400/10 transition-all duration-300 hover:-translate-y-1 hover:border-green-200 dark:hover:border-green-700 cursor-pointer">
@@ -85,10 +85,10 @@ export const ChatContainer: React.FC = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-3">
                     KPI frameworks, cohort analysis, A/B testing, and performance metrics
                   </p>
-                  <div className="flex items-center text-green-600 dark:text-green-400 text-xs font-medium">
+                  {/*<div className="flex items-center text-green-600 dark:text-green-400 text-xs font-medium">
                     <Rocket className="w-3 h-3 mr-1.5" />
                     Get Started
-                  </div>
+                  </div>*/}
                 </div>
                 
                 <div className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-5 rounded-xl border border-gray-200/50 dark:border-gray-700/50 hover:shadow-xl hover:shadow-orange-500/10 dark:hover:shadow-orange-400/10 transition-all duration-300 hover:-translate-y-1 hover:border-orange-200 dark:hover:border-orange-700 cursor-pointer">
@@ -101,10 +101,10 @@ export const ChatContainer: React.FC = () => {
                   <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-3">
                     Feature prioritization, sprint planning, resource allocation, and go-to-market
                   </p>
-                  <div className="flex items-center text-orange-600 dark:text-orange-400 text-xs font-medium">
+                  {/*<div className="flex items-center text-orange-600 dark:text-orange-400 text-xs font-medium">
                     <Rocket className="w-3 h-3 mr-1.5" />
                     Get Started
-                  </div>
+                  </div>*/}
                 </div>
               </div>
               
