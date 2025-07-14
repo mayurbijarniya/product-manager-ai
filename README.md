@@ -1,32 +1,27 @@
 # Product Manager AI
 
-> AI-powered assistant for product managers with strategic insights, data analysis, and PM frameworks.
+> AI-powered assistant for product managers with strategic insights, data analysis, and PM frameworks. Choose between Claude 4.0 Sonnet and Gemini 2.5 Pro models.
 
 ## ✨ Features
 
-- 🤖 **Senior PM AI Assistant** - Strategic insights, roadmapping, and data-driven recommendations
-- 🎯 **Feature Prioritization** - RICE scoring framework with automated analysis
-- 🏆 **Competitive Analysis** - Market positioning and strategic recommendations  
-- 👥 **User Research Tools** - Persona development and interview guide generation
-- 📊 **KPI Dashboard Design** - Metrics frameworks and analytics strategy
-- 📁 **File Analysis** - Upload CSV/Excel/JSON for product insights
-- 💬 **Conversation Memory** - Persistent chat history across sessions
-- 🌙 **Dark/Light Mode** - Professional UI with theme switching
-- 📱 **Mobile Optimized** - Responsive design for all devices
+- 🤖 **Dual AI Models** - Claude 4.0 Sonnet and Gemini 2.5 Pro
+- 🎯 **PM Frameworks** - RICE scoring, competitive analysis, user research
+- 📊 **File Analysis** - Upload CSV/Excel/JSON for insights
+- 💬 **Conversation Memory** - Persistent chat history
+- 🌙 **Dark/Light Mode** - Professional UI
+- 📱 **Mobile Optimized** - Responsive design
 
 ## 🚀 Quick Start
 
-1. **Clone & Install**
+1. **Install**
    ```bash
-   git clone <your-repo-url>
-   cd product-manager-ai
    npm install
    ```
 
 2. **Setup Environment**
    ```bash
    cp .env.example .env.local
-   # Add your Gemini API key to .env.local
+   # Add your API keys to .env.local
    ```
 
 3. **Run**
@@ -38,29 +33,26 @@
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `VITE_GEMINI_API_KEY` | Google Gemini AI API key | ✅ |
+| `VITE_DEEPINFRA_API_KEY` | DeepInfra API key for Claude | ✅ |
+| `VITE_GEMINI_API_KEY` | Google AI Studio API key for Gemini | ✅ |
 
-Get your API key: [Google AI Studio](https://makersuite.google.com/app/apikey)
+Get API keys:
+- **DeepInfra**: [Dashboard](https://deepinfra.com/dash/api_keys)
+- **Google AI Studio**: [API Keys](https://makersuite.google.com/app/apikey)
+
+## 🔒 Security
+
+⚠️ **Never commit API keys to version control!**
+- Copy `.env.example` to `.env.local` and add your actual API keys
+- Test files are ignored to prevent accidental commits
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 18, TypeScript, Tailwind CSS
-- **AI**: Google Gemini AI
-- **State**: Zustand
+- **AI**: Claude 4.0 Sonnet (DeepInfra), Gemini 2.5 Pro (Google AI)
+- **State**: Zustand with persistence
 - **Build**: Vite
-
-## 📦 Deployment
-
-### Vercel
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/product-manager-ai)
-
-### Netlify
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/yourusername/product-manager-ai)
 
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
-
----
-
-**Made with ❤️ for Product Managers**
