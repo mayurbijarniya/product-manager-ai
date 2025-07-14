@@ -147,11 +147,11 @@ Answer (one word only):`;
   }
 
   private constructor() {
-    // Get API key from environment variable with fallback
-    this.apiKey = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyDgR_xkgaphQWNnF88WHvQ05u_nTluzc7I';
+    // Get API key from environment variable
+    this.apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     
-    if (!this.apiKey || this.apiKey === 'your_gemini_api_key_here') {
-      console.warn('⚠️ Using fallback API key. For production, please set VITE_GEMINI_API_KEY in your environment variables.');
+    if (!this.apiKey) {
+      console.error('❌ VITE_GEMINI_API_KEY is required. Please set it in your environment variables.');
     }
   }
 
