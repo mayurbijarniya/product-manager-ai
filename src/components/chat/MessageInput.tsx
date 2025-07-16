@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Square, Sparkles, Zap, Plus } from 'lucide-react';
+import { Send, Paperclip, Square, Sparkles, Zap, Lightbulb, Rocket } from 'lucide-react';
 import { FileSpreadsheet, FileText, File as FileIcon } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { FileUpload } from '../features/FileUpload';
@@ -189,8 +189,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     handleAIResponse();
   }, [isLoading, conversationId]); // Simplified dependencies to prevent unnecessary re-runs
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!message.trim() || isLoading) return;
 
     // Hide suggestions when user sends a message
@@ -229,7 +228,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e as any);
+      handleSubmit();
     }
   };
 
@@ -295,19 +294,15 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     }, 0);
   };
 
-  const handleFileUploadClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleFileUploadClick = () => {
     setShowFileUpload(!showFileUpload);
   };
 
-  const handleSendClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleSendClick = () => {
     if (isLoading) {
       handleStop();
     } else if (message.trim()) {
-      handleSubmit(e as any);
+      handleSubmit();
     }
   };
 
@@ -379,36 +374,34 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
             
             {/* Right side - Typing suggestion */}
             <div className="flex-1 flex justify-end">
-              <button
+              <div
                 onClick={() => handleSuggestionClick(quickSuggestions[currentSuggestionIndex])}
-                disabled={isLoading}
-                className="px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 dark:text-blue-300 dark:border-blue-700"
+                className="px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 cursor-pointer border hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 dark:text-blue-300 dark:border-blue-700"
               >
                 <Sparkles className="w-3 h-3 inline mr-1.5 opacity-60" />
                 <span className="typing-text">
                   {typingText}
                   {isTyping && <span className="animate-pulse">|</span>}
                 </span>
-              </button>
+              </div>
             </div>
           </div>
         )}
         
-        <form onSubmit={handleSubmit} className="relative">
+        {/* Input Container - NO FORM WRAPPER */}
+        <div className="relative">
           {/* Single Container - Modern AI Assistant Style */}
           <div className="relative bg-white dark:bg-gray-800 rounded-3xl border-2 border-blue-200 dark:border-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-400 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
             
             <div className="flex items-end gap-3 p-4">
               {/* File Upload Button */}
-              <button
-                type="button"
+              <div
                 onClick={handleFileUploadClick}
-                disabled={isLoading}
-                className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800"
+                className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800"
               >
                 <Paperclip className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
-              </button>
+              </div>
 
               {/* Message Input */}
               <div className="flex-1 relative">
@@ -433,27 +426,25 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
               )}
 
               {/* Send/Stop Button */}
-              <button
-                type="button"
+              <div
                 onClick={handleSendClick}
-                disabled={!isLoading && !message.trim()}
-                className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md ${
+                className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md ${
                   isLoading
                     ? 'text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105 focus:ring-red-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
                     : message.trim()
                     ? 'text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105 focus:ring-blue-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
                     : 'text-gray-400 bg-gray-100 dark:bg-gray-700 cursor-not-allowed'
-                }`}
+                } ${!isLoading && !message.trim() ? 'pointer-events-none' : ''}`}
               >
                 {isLoading ? (
                   <Square className="w-4 h-4 fill-current" />
                 ) : (
                   <Send className="w-4 h-4" />
                 )}
-              </button>
+              </div>
             </div>
           </div>
-        </form>
+        </div>
 
         {/* Compact Footer info */}
         <div className="flex items-center justify-center mt-3 text-xs text-gray-500 dark:text-gray-400">
