@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Square, Sparkles, Zap } from 'lucide-react';
+import { Send, Paperclip, Square, Sparkles, Zap, Plus } from 'lucide-react';
 import { FileSpreadsheet, FileText, File as FileIcon } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { FileUpload } from '../features/FileUpload';
@@ -14,6 +14,7 @@ interface MessageInputProps {
 export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) => {
   const [message, setMessage] = useState('');
   const [showFileUpload, setShowFileUpload] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const { 
@@ -30,6 +31,16 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   
   // Get conversation-specific state
   const { isLoading, streamingMessage } = getConversationState(conversationId);
+
+  // Hide suggestions when user starts typing or when there are messages
+  useEffect(() => {
+    const conversation = getCurrentConversation();
+    if (conversation && conversation.messages.length > 0) {
+      setShowSuggestions(false);
+    } else {
+      setShowSuggestions(true);
+    }
+  }, [getCurrentConversation]);
 
   // Auto-trigger AI response when loading state changes and there's a new user message
   useEffect(() => {
@@ -126,6 +137,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     e.preventDefault();
     if (!message.trim() || isLoading) return;
 
+    // Hide suggestions when user sends a message
+    setShowSuggestions(false);
+
     const userMessage = message.trim();
     setMessage('');
     
@@ -173,6 +187,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
+    
+    // Hide suggestions when user starts typing
+    if (e.target.value.trim() && showSuggestions) {
+      setShowSuggestions(false);
+    }
+    
     adjustTextareaHeight();
   };
 
@@ -212,6 +232,18 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     'Design user research study',
     'Build KPI dashboard',
   ];
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setMessage(suggestion);
+    setShowSuggestions(false);
+    // Focus the textarea after setting the message
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        adjustTextareaHeight();
+      }
+    }, 0);
+  };
 
   return (
     <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl">
@@ -266,21 +298,23 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
         )}
         
         <form onSubmit={handleSubmit} className="relative">
-          <div className="flex items-center gap-3">
-            {/* File Upload Button - Same height as input, centered */}
-            <button
-              type="button"
-              onClick={() => setShowFileUpload(!showFileUpload)}
-              disabled={isLoading}
-              className="flex-shrink-0 w-12 h-12 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 shadow-md hover:shadow-lg hover:scale-105 border border-gray-200 dark:border-gray-700"
-            >
-              <Paperclip className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
-            </button>
+          {/* Single Container - Modern AI Assistant Style */}
+          <div className="relative bg-white dark:bg-gray-800 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
+            
+            <div className="flex items-end gap-3 p-4">
+              {/* File Upload Button */}
+              <button
+                type="button"
+                onClick={() => setShowFileUpload(!showFileUpload)}
+                disabled={isLoading}
+                className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800"
+              >
+                <Paperclip className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+              </button>
 
-            {/* Message Input Container */}
-            <div className="flex-1 relative">
-              <div className="relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
+              {/* Message Input */}
+              <div className="flex-1 relative">
                 <textarea
                   ref={textareaRef}
                   value={message}
@@ -288,42 +322,50 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                   onKeyDown={handleKeyDown}
                   placeholder="Ask about product strategy, roadmapping, user research, or any PM topic..."
                   disabled={isLoading}
-                  className="relative w-full px-6 py-3 pr-14 resize-none focus:outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 transition-all duration-200 text-base leading-relaxed min-h-[48px]"
+                  className="relative w-full resize-none focus:outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 transition-all duration-200 text-base leading-relaxed min-h-[24px] py-1"
                   rows={1}
                   style={{ maxHeight: '120px' }}
                 />
-                
-                {/* Send/Stop Button - Same size as paperclip */}
-                <button
-                  type={isLoading ? 'button' : 'submit'}
-                  onClick={isLoading ? handleStop : undefined}
-                  disabled={!isLoading && !message.trim()}
-                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md ${
-                    isLoading
-                      ? 'text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105 focus:ring-red-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
-                      : message.trim()
-                      ? 'text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105 focus:ring-blue-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
-                      : 'text-gray-400 bg-gray-100 dark:bg-gray-700 cursor-not-allowed'
-                  }`}
-                >
-                  {isLoading ? (
-                    <Square className="w-4 h-4 fill-current" />
-                  ) : (
-                    <Send className="w-4 h-4" />
-                  )}
-                </button>
               </div>
+
+              {/* Send/Stop Button */}
+              <button
+                type={isLoading ? 'button' : 'submit'}
+                onClick={isLoading ? handleStop : undefined}
+                disabled={!isLoading && !message.trim()}
+                className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md ${
+                  isLoading
+                    ? 'text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105 focus:ring-red-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
+                    : message.trim()
+                    ? 'text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105 focus:ring-blue-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
+                    : 'text-gray-400 bg-gray-100 dark:bg-gray-700 cursor-not-allowed'
+                }`}
+              >
+                {isLoading ? (
+                  <Square className="w-4 h-4 fill-current" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+              </button>
             </div>
           </div>
         </form>
 
-        {/* Quick suggestions - HIDDEN on mobile (sm and below), visible on tablet+ */}
-        {!isLoading && (
+        {/* Typing Animation Suggestions - Only show for new conversations */}
+        {!isLoading && showSuggestions && (
           <div className="mt-3 hidden md:flex flex-wrap gap-2">
+            <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mr-3 animate-pulse">
+              <div className="flex space-x-1 mr-2">
+                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
+              Try asking:
+            </div>
             {quickSuggestions.map((suggestion, index) => (
               <button
                 key={suggestion}
-                onClick={() => setMessage(suggestion)}
+                onClick={() => handleSuggestionClick(suggestion)}
                 disabled={isLoading}
                 className={`px-3 py-1.5 text-xs font-medium bg-gradient-to-r ${
                   index === 0 ? 'from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200' :
@@ -332,7 +374,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                   'from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 text-orange-700 border-orange-200'
                 } dark:from-gray-800 dark:to-gray-700 dark:hover:from-gray-700 dark:hover:to-gray-600 dark:text-gray-300 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900`}
               >
-                <Sparkles className="w-3 h-3 inline mr-1.5" />
+                <Sparkles className="w-3 h-3 inline mr-1.5 opacity-60" />
                 {suggestion}
               </button>
             ))}
@@ -341,7 +383,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
 
         {/* Compact Footer info */}
         <div className="flex items-center justify-center mt-3 text-xs text-gray-500 dark:text-gray-400">
-          <Zap className="w-3 h-3 mr-1" />
+          <Zap className="w-3 h-3 mr-1 opacity-60" />
           AI can make mistakes. Always verify important information and strategic decisions.
         </div>
       </div>
