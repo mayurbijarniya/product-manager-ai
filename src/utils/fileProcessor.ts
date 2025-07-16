@@ -116,10 +116,42 @@ const processText = (file: File): Promise<any[]> => {
     reader.onload = (e) => {
       try {
         const text = e.target?.result as string;
-        // Split by lines and create array of objects
+        
+        // Try to detect if it's structured data (JSON-like, CSV-like, etc.)
         const lines = text.split('\n').filter(line => line.trim());
+        
+        // Check if it looks like CSV data
+        if (lines.length > 1 && lines[0].includes(',')) {
+          // Try to parse as CSV
+          try {
+            const result = Papa.parse(text, {
+              header: true,
+              skipEmptyLines: true,
+            });
+            if (result.data && result.data.length > 0) {
+              resolve(result.data);
+              return;
+            }
+          } catch (csvError) {
+            console.warn('Failed to parse as CSV, treating as plain text');
+          }
+        }
+        
+        // Check if it looks like JSON
+        if (text.trim().startsWith('[') || text.trim().startsWith('{')) {
+          try {
+            const jsonData = JSON.parse(text);
+            const data = Array.isArray(jsonData) ? jsonData : [jsonData];
+            resolve(data);
+            return;
+          } catch (jsonError) {
+            console.warn('Failed to parse as JSON, treating as plain text');
+          }
+        }
+        
+        // Fallback: treat as plain text with line-by-line structure
         const data = lines.map((line, index) => ({
-          line: index + 1,
+          line_number: index + 1,
           content: line.trim(),
         }));
         resolve(data);

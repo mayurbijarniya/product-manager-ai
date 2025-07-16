@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, Square, Sparkles, Zap } from 'lucide-react';
+import { FileSpreadsheet, FileText, File as FileIcon } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { FileUpload } from '../features/FileUpload';
 import { useAppStore } from '../../stores/appStore';
+import type { FileData } from '../../types';
 import { geminiService } from '../../utils/geminiService';
 
 interface MessageInputProps {
@@ -21,7 +23,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     setConversationAbortController,
     stopConversationAI,
     getConversationState,
-    getCurrentConversation 
+    getCurrentConversation,
+    uploadedFiles,
+    removeFile
   } = useAppStore();
   
   // Get conversation-specific state
@@ -173,12 +177,33 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   };
 
   const handleFileProcessed = (analysisPrompt: string) => {
-    setMessage(analysisPrompt);
     setShowFileUpload(false);
-    // Auto-focus the textarea
-    setTimeout(() => {
-      textareaRef.current?.focus();
-    }, 100);
+    // Just close the upload UI, files are now attached
+  };
+  const getFileIcon = (type: string) => {
+    if (type.includes('spreadsheet') || type.includes('excel') || type.includes('csv')) {
+      return FileSpreadsheet;
+    }
+    if (type.includes('text') || type.includes('json')) {
+      return FileText;
+    }
+    return FileIcon;
+  };
+
+  const getFileTypeLabel = (type: string, name: string) => {
+    if (type.includes('csv') || name.endsWith('.csv')) return 'Spreadsheet';
+    if (type.includes('excel') || name.endsWith('.xlsx') || name.endsWith('.xls')) return 'Spreadsheet';
+    if (type.includes('json') || name.endsWith('.json')) return 'File';
+    if (type.includes('text') || name.endsWith('.txt')) return 'Document';
+    return 'File';
+  };
+
+  const getFileIconColor = (type: string, name: string) => {
+    if (type.includes('csv') || name.endsWith('.csv')) return 'bg-green-500';
+    if (type.includes('excel') || name.endsWith('.xlsx') || name.endsWith('.xls')) return 'bg-green-600';
+    if (type.includes('json') || name.endsWith('.json')) return 'bg-blue-500';
+    if (type.includes('text') || name.endsWith('.txt')) return 'bg-red-500';
+    return 'bg-gray-500';
   };
 
   const quickSuggestions = [
@@ -191,6 +216,46 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   return (
     <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl">
       <div className="max-w-4xl mx-auto px-4 sm:px-4 lg:px-6 py-4 sm:py-6">
+        {/* File Attachments - ChatGPT Style */}
+        {uploadedFiles.length > 0 && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            {uploadedFiles.map((file) => {
+              const IconComponent = getFileIcon(file.type);
+              const typeLabel = getFileTypeLabel(file.type, file.name);
+              const iconColor = getFileIconColor(file.type, file.name);
+              
+              return (
+                <div
+                  key={file.name}
+                  className="flex items-center space-x-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 group max-w-xs"
+                >
+                  <div className={`w-10 h-10 ${iconColor} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                    <IconComponent className="w-5 h-5 text-white" />
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      {file.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {typeLabel}
+                    </p>
+                  </div>
+                  
+                  <button
+                    onClick={() => removeFile(file.name)}
+                    className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 flex-shrink-0"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        
         {showFileUpload && (
           <div className="mb-4">
             <FileUpload 

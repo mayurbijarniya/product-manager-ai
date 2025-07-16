@@ -20,24 +20,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onClose, onFileProcessed
         const processedFile = await processFile(file);
         addFile(processedFile);
         
-        // Just notify that file was uploaded successfully
+        // File uploaded successfully - no notification needed, just close upload UI
         if (onFileProcessed) {
-          const uploadNotification = `📎 **File uploaded successfully:** ${processedFile.name}
-
-**File Details:**
-- Size: ${(processedFile.size / 1024).toFixed(1)} KB
-- Records: ${processedFile.content.length}
-- Type: ${processedFile.type}
-
-✅ **Ready for analysis!** You can now ask me questions about this data, such as:
-- "Analyze the top-performing products"
-- "Show me customer satisfaction trends"
-- "Create a competitive analysis table"
-- "What are the key insights from this data?"
-
-What would you like to know about your data?`;
-
-          onFileProcessed(uploadNotification);
+          onFileProcessed(''); // Empty string to close upload UI without adding message
         }
       } catch (error) {
         console.error('Error processing file:', error);

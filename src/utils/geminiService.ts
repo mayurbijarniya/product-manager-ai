@@ -391,11 +391,12 @@ IMPORTANT: Please provide a COMPLETE table with ALL rows filled out. Do not stop
           fileContext += `📈 **Total Records: ${file.content.length}**\n`;
           fileContext += `📋 **File Type: ${file.type}**\n`;
           
-          // Include more data for better analysis
+          // Include sample data for better analysis - show more for smaller files
+          const sampleSize = file.content.length <= 100 ? Math.min(file.content.length, 50) : 20;
           if (file.content.length > 0) {
-            fileContext += `\n🎯 **ACTUAL DATA TO ANALYZE (first 20 rows):**\n`;
+            fileContext += `\n🎯 **ACTUAL DATA TO ANALYZE (first ${sampleSize} rows):**\n`;
             fileContext += '```json\n';
-            fileContext += JSON.stringify(file.content.slice(0, 20), null, 2);
+            fileContext += JSON.stringify(file.content.slice(0, sampleSize), null, 2);
             fileContext += '\n```\n';
             
             // Show column structure for better understanding
@@ -406,8 +407,8 @@ IMPORTANT: Please provide a COMPLETE table with ALL rows filled out. Do not stop
             }
             
             // For large datasets, emphasize full analysis
-            if (file.content.length > 20) {
-              fileContext += `\n⚠️ **IMPORTANT:** This shows only the first 20 rows for context. Your analysis must consider ALL ${file.content.length} records in the dataset. Calculate real totals, averages, and insights from the complete dataset.\n`;
+            if (file.content.length > sampleSize) {
+              fileContext += `\n⚠️ **IMPORTANT:** This shows only the first ${sampleSize} rows for context. Your analysis must consider ALL ${file.content.length} records in the dataset. Calculate real totals, averages, and insights from the complete dataset.\n`;
             }
           }
         });
