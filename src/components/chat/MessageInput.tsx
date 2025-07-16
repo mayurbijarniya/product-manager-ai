@@ -72,12 +72,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
           clearInterval(typingInterval);
           setIsTyping(false);
           
-          // Show completed text for 1 second, then move to next
+          // Show completed text for 1.5 seconds, then move to next
           suggestionTimeout = setTimeout(() => {
             setCurrentSuggestionIndex((prev) => (prev + 1) % quickSuggestions.length);
-          }, 1000);
+          }, 1500);
         }
-      }, 50); // Typing speed
+      }, 80); // Typing speed
     };
 
     // Start typing the current suggestion
@@ -359,51 +359,43 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
           </div>
         )}
         
-        {/* Continuous Typing Animation Suggestions */}
+        {/* Centered Typing Animation Suggestions */}
         {!isLoading && showSuggestions && (
-          <div className="mb-6 flex items-center justify-between">
-            {/* Left side - "Try asking:" with dots */}
-            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-              <div className="flex space-x-1 mr-2">
-                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div className="mb-6 flex items-center justify-center">
+            <div className="flex items-center space-x-4">
+              {/* Left side - "Try asking:" with dots */}
+              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex space-x-1 mr-2">
+                  <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+                Try asking:
               </div>
-              Try asking:
-            </div>
-            
-            {/* Right side - Typing suggestion */}
-            <div className="flex-1 flex justify-end">
+              
+              {/* Right side - Typing suggestion */}
               <div
                 onClick={() => handleSuggestionClick(quickSuggestions[currentSuggestionIndex])}
                 className="px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 cursor-pointer border hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 dark:text-blue-300 dark:border-blue-700"
               >
                 <Sparkles className="w-3 h-3 inline mr-1.5 opacity-60" />
-                <span className="typing-text">
+                <span className="typing-text min-w-[200px] inline-block">
                   {typingText}
-                  {isTyping && <span className="animate-pulse">|</span>}
+                  {isTyping && <span className="animate-typing">|</span>}
                 </span>
               </div>
             </div>
           </div>
         )}
         
-        {/* Input Container - NO FORM WRAPPER */}
+        {/* Input Container */}
         <div className="relative">
-          {/* Single Container - Modern AI Assistant Style */}
+          {/* Main Input Container */}
           <div className="relative bg-white dark:bg-gray-800 rounded-3xl border-2 border-blue-200 dark:border-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-400 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
             
             <div className="flex items-end gap-3 p-4">
-              {/* File Upload Button */}
-              <div
-                onClick={handleFileUploadClick}
-                className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800"
-              >
-                <Paperclip className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
-              </div>
-
-              {/* Message Input */}
+              {/* Message Input - Full width */}
               <div className="flex-1 relative">
                 <textarea
                   ref={textareaRef}
@@ -417,31 +409,46 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                   style={{ maxHeight: '120px' }}
                 />
               </div>
+            </div>
 
-              {/* File Upload Icon (Excel style) */}
-              {uploadedFiles.length > 0 && (
-                <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                  <FileSpreadsheet className="w-4 h-4 text-white" />
-                </div>
-              )}
+            {/* Action Buttons Row - Below text input */}
+            <div className="flex items-center justify-between px-4 pb-4">
+              {/* Left side - File upload and other action buttons */}
+              <div className="flex items-center space-x-2">
+                {/* File Upload Button */}
+                <button
+                  onClick={handleFileUploadClick}
+                  className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800"
+                >
+                  <Paperclip className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                </button>
 
-              {/* Send/Stop Button */}
-              <div
+                {/* File Upload Icon (Excel style) - Show when files attached */}
+                {uploadedFiles.length > 0 && (
+                  <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                    <FileSpreadsheet className="w-4 h-4 text-white" />
+                  </div>
+                )}
+              </div>
+
+              {/* Right side - Send button */}
+              <button
                 onClick={handleSendClick}
-                className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md ${
+                disabled={!message.trim() && !isLoading}
+                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md ${
                   isLoading
                     ? 'text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105 focus:ring-red-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
                     : message.trim()
                     ? 'text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105 focus:ring-blue-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
                     : 'text-gray-400 bg-gray-100 dark:bg-gray-700 cursor-not-allowed'
-                } ${!isLoading && !message.trim() ? 'pointer-events-none' : ''}`}
+                }`}
               >
                 {isLoading ? (
                   <Square className="w-4 h-4 fill-current" />
                 ) : (
                   <Send className="w-4 h-4" />
                 )}
-              </div>
+              </button>
             </div>
           </div>
         </div>
