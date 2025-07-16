@@ -199,7 +199,28 @@ Answer (one word only):`;
   private getSystemPrompt(): string {
     return `You are a senior Product Manager AI assistant with 10+ years of experience at top tech companies. You maintain conversation context and provide personalized, actionable advice.
 
-CRITICAL: When analyzing uploaded data files, you MUST use the actual data provided in the context. Never fabricate or make up data points, product names, or statistics. Base all analysis strictly on the real data shown.
+🚨 CRITICAL DATA ANALYSIS RULES:
+
+1. **ONLY ANALYZE REAL DATA**: When users upload files, you will receive the actual parsed data in JSON format. Use ONLY this data for all analysis.
+
+2. **NEVER FABRICATE**: Do not create fictional products, metrics, or insights. If a product name, category, or metric doesn't exist in the uploaded data, do not mention it.
+
+3. **CALCULATE FROM ACTUAL DATA**: 
+   - Sum actual quantities and prices for revenue calculations
+   - Calculate real averages from actual review scores
+   - Count actual occurrences for percentages
+   - Use actual product names from the data
+
+4. **NO TEMPLATES OR EXAMPLES**: Do not use template responses or example data. Every number, product name, and insight must come from the real uploaded file.
+
+5. **VERIFY DATA EXISTENCE**: Before mentioning any product, category, or metric, confirm it exists in the provided dataset.
+
+6. **REAL CALCULATIONS ONLY**: 
+   - Top products = actual products ranked by real sales/revenue
+   - Average scores = calculated from actual review_score values
+   - Percentages = actual counts divided by total records
+
+7. **DATA ACCURACY FIRST**: If you cannot find specific data in the uploaded file, say "This data is not available in the uploaded file" rather than making assumptions.
 
 PERSONALITY & APPROACH:
 - Professional but approachable
@@ -363,27 +384,40 @@ IMPORTANT: Please provide a COMPLETE table with ALL rows filled out. Do not stop
       // Add current message
       // If there are uploaded files, include their data in the context
       if (uploadedFiles.length > 0) {
-        let fileContext = '\n\n**UPLOADED DATA FILES:**\n';
+        let fileContext = '\n\n🔍 **REAL DATA FROM UPLOADED FILES - ANALYZE ONLY THIS DATA:**\n';
         
         uploadedFiles.forEach(file => {
-          fileContext += `\n**File: ${file.name}**\n`;
-          fileContext += `Type: ${file.type}\n`;
-          fileContext += `Records: ${file.content.length}\n`;
+          fileContext += `\n📊 **File: ${file.name}**\n`;
+          fileContext += `📈 **Total Records: ${file.content.length}**\n`;
+          fileContext += `📋 **File Type: ${file.type}**\n`;
           
-          // Include sample of actual data (first 10 rows for context)
+          // Include more data for better analysis
           if (file.content.length > 0) {
-            fileContext += `\nSample data (first 10 rows):\n`;
+            fileContext += `\n🎯 **ACTUAL DATA TO ANALYZE (first 20 rows):**\n`;
             fileContext += '```json\n';
-            fileContext += JSON.stringify(file.content.slice(0, 10), null, 2);
+            fileContext += JSON.stringify(file.content.slice(0, 20), null, 2);
             fileContext += '\n```\n';
             
-            // For large datasets, include summary statistics
-            if (file.content.length > 100) {
-              fileContext += `\nNote: Full dataset contains ${file.content.length} records. `;
-              fileContext += `Analyze patterns across the entire dataset, not just the sample shown.\n`;
+            // Show column structure for better understanding
+            if (file.content.length > 0) {
+              const firstRow = file.content[0];
+              const columns = Object.keys(firstRow);
+              fileContext += `\n📋 **Available Columns:** ${columns.join(', ')}\n`;
+            }
+            
+            // For large datasets, emphasize full analysis
+            if (file.content.length > 20) {
+              fileContext += `\n⚠️ **IMPORTANT:** This shows only the first 20 rows for context. Your analysis must consider ALL ${file.content.length} records in the dataset. Calculate real totals, averages, and insights from the complete dataset.\n`;
             }
           }
         });
+        
+        fileContext += `\n🚨 **CRITICAL REMINDER:** 
+- Use ONLY the product names, categories, and values shown in this real data
+- Calculate ALL metrics from this actual dataset
+- Do NOT create fictional examples or template responses
+- If data doesn't exist in the file, explicitly state it's not available
+- Every number and insight must be derived from this real data\n`;
         
         enhancedMessage = `${enhancedMessage}${fileContext}`;
       }
