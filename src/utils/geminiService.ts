@@ -179,6 +179,15 @@ Answer (one word only):`;
       console.error('❌ VITE_GEMINI_API_KEY is required. Please set it in your environment variables.');
     }
   }
+  
+  // Method to get uploaded files from the app store
+  private getUploadedFiles() {
+    // Access the store directly to get uploaded files
+    if (typeof window !== 'undefined' && (window as any).__APP_STORE__) {
+      return (window as any).__APP_STORE__.getState().uploadedFiles || [];
+    }
+    return [];
+  }
 
   static getInstance(): GeminiService {
     if (!GeminiService.instance) {
@@ -189,6 +198,8 @@ Answer (one word only):`;
 
   private getSystemPrompt(): string {
     return `You are a senior Product Manager AI assistant with 10+ years of experience at top tech companies. You maintain conversation context and provide personalized, actionable advice.
+
+CRITICAL: When analyzing uploaded data files, you MUST use the actual data provided in the context. Never fabricate or make up data points, product names, or statistics. Base all analysis strictly on the real data shown.
 
 PERSONALITY & APPROACH:
 - Professional but approachable
@@ -258,6 +269,9 @@ Remember: You're having an ongoing conversation, not answering isolated question
     onStream?: (chunk: string) => void,
     abortSignal?: AbortSignal
   ): Promise<string> {
+    // Get uploaded files from store for context
+    const uploadedFiles = this.getUploadedFiles();
+    
     try {
       // Check if request was aborted before starting
       if (abortSignal?.aborted) {
@@ -347,6 +361,33 @@ IMPORTANT: Please provide a COMPLETE table with ALL rows filled out. Do not stop
       }
 
       // Add current message
+      // If there are uploaded files, include their data in the context
+      if (uploadedFiles.length > 0) {
+        let fileContext = '\n\n**UPLOADED DATA FILES:**\n';
+        
+        uploadedFiles.forEach(file => {
+          fileContext += `\n**File: ${file.name}**\n`;
+          fileContext += `Type: ${file.type}\n`;
+          fileContext += `Records: ${file.content.length}\n`;
+          
+          // Include sample of actual data (first 10 rows for context)
+          if (file.content.length > 0) {
+            fileContext += `\nSample data (first 10 rows):\n`;
+            fileContext += '```json\n';
+            fileContext += JSON.stringify(file.content.slice(0, 10), null, 2);
+            fileContext += '\n```\n';
+            
+            // For large datasets, include summary statistics
+            if (file.content.length > 100) {
+              fileContext += `\nNote: Full dataset contains ${file.content.length} records. `;
+              fileContext += `Analyze patterns across the entire dataset, not just the sample shown.\n`;
+            }
+          }
+        });
+        
+        enhancedMessage = `${enhancedMessage}${fileContext}`;
+      }
+      
       contents.push({
         role: 'user',
         parts: [{ text: enhancedMessage }]

@@ -93,6 +93,12 @@ export const useAppStore = create<AppState>()(
       conversationStates: {},
       uploadedFiles: [],
       
+      // Expose store globally for AI service access
+      ...(typeof window !== 'undefined' && (() => {
+        (window as any).__APP_STORE__ = { getState: get };
+        return {};
+      })()),
+      
       // Actions
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       setTheme: (theme) => set({ theme }),
