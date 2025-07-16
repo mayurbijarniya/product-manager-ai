@@ -16,7 +16,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState(0);
-  const [isTypingAnimation, setIsTypingAnimation] = useState(true);
+  const [typingText, setTypingText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const { 
@@ -51,29 +52,49 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     }
   }, [getCurrentConversation]);
 
-  // Typing animation effect for suggestions
+  // Continuous typing animation effect
   useEffect(() => {
     if (!showSuggestions) return;
 
-    const interval = setInterval(() => {
-      setCurrentSuggestionIndex((prev) => {
-        const next = (prev + 1) % quickSuggestions.length;
-        if (next === 0) {
-          // Completed one full cycle, show all suggestions
-          setTimeout(() => setIsTypingAnimation(false), 500);
-        }
-        return next;
-      });
-    }, 1500); // Show each suggestion for 1.5 seconds
+    let typingInterval: NodeJS.Timeout;
+    let suggestionTimeout: NodeJS.Timeout;
 
-    return () => clearInterval(interval);
-  }, [showSuggestions, quickSuggestions.length]);
+    const typeText = (text: string) => {
+      setTypingText('');
+      setIsTyping(true);
+      let currentIndex = 0;
+      
+      typingInterval = setInterval(() => {
+        if (currentIndex <= text.length) {
+          setTypingText(text.slice(0, currentIndex));
+          currentIndex++;
+        } else {
+          clearInterval(typingInterval);
+          setIsTyping(false);
+          
+          // Show completed text for 1 second, then move to next
+          suggestionTimeout = setTimeout(() => {
+            setCurrentSuggestionIndex((prev) => (prev + 1) % quickSuggestions.length);
+          }, 1000);
+        }
+      }, 50); // Typing speed
+    };
+
+    // Start typing the current suggestion
+    typeText(quickSuggestions[currentSuggestionIndex]);
+
+    return () => {
+      clearInterval(typingInterval);
+      clearTimeout(suggestionTimeout);
+    };
+  }, [currentSuggestionIndex, showSuggestions, quickSuggestions]);
 
   // Reset animation when suggestions are shown again
   useEffect(() => {
     if (showSuggestions) {
       setCurrentSuggestionIndex(0);
-      setIsTypingAnimation(true);
+      setTypingText('');
+      setIsTyping(false);
     }
   }, [showSuggestions]);
 
@@ -274,6 +295,22 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     }, 0);
   };
 
+  const handleFileUploadClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowFileUpload(!showFileUpload);
+  };
+
+  const handleSendClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isLoading) {
+      handleStop();
+    } else if (message.trim()) {
+      handleSubmit(e as any);
+    }
+  };
+
   return (
     <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl">
       <div className="max-w-4xl mx-auto px-4 sm:px-4 lg:px-6 py-4 sm:py-6">
@@ -327,10 +364,10 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
           </div>
         )}
         
-        {/* Sequential Typing Animation Suggestions - Centered */}
+        {/* Continuous Typing Animation Suggestions */}
         {!isLoading && showSuggestions && (
-          <div className="mb-6 flex flex-col items-center space-y-3">
-            {/* Static "Try asking:" with typing dots */}
+          <div className="mb-6 flex items-center justify-between">
+            {/* Left side - "Try asking:" with dots */}
             <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
               <div className="flex space-x-1 mr-2">
                 <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -340,61 +377,33 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
               Try asking:
             </div>
             
-            {/* Sequential suggestion display */}
-            <div className="flex flex-wrap justify-center gap-2 min-h-[40px] items-center">
-              {isTypingAnimation ? (
-                // Show one suggestion at a time during typing animation
-                <button
-                  key={quickSuggestions[currentSuggestionIndex]}
-                  onClick={() => handleSuggestionClick(quickSuggestions[currentSuggestionIndex])}
-                  disabled={isLoading}
-                  className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 animate-fade-in ${
-                    currentSuggestionIndex === 0 ? 'bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 dark:text-blue-300 dark:border-blue-700' :
-                    currentSuggestionIndex === 1 ? 'bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 text-purple-700 border-purple-200 dark:from-purple-900/20 dark:to-purple-800/20 dark:text-purple-300 dark:border-purple-700' :
-                    currentSuggestionIndex === 2 ? 'bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 text-green-700 border-green-200 dark:from-green-900/20 dark:to-green-800/20 dark:text-green-300 dark:border-green-700' :
-                    'bg-gradient-to-r from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 text-orange-700 border-orange-200 dark:from-orange-900/20 dark:to-orange-800/20 dark:text-orange-300 dark:border-orange-700'
-                  }`}
-                >
-                  <Sparkles className="w-3 h-3 inline mr-1.5 opacity-60" />
-                  {quickSuggestions[currentSuggestionIndex]}
-                </button>
-              ) : (
-                // Show all suggestions after animation completes
-                quickSuggestions.map((suggestion, index) => (
-                  <button
-                    key={suggestion}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                    disabled={isLoading}
-                    className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 ${
-                      index === 0 ? 'bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 dark:text-blue-300 dark:border-blue-700' :
-                      index === 1 ? 'bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 text-purple-700 border-purple-200 dark:from-purple-900/20 dark:to-purple-800/20 dark:text-purple-300 dark:border-purple-700' :
-                      index === 2 ? 'bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 text-green-700 border-green-200 dark:from-green-900/20 dark:to-green-800/20 dark:text-green-300 dark:border-green-700' :
-                      'bg-gradient-to-r from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 text-orange-700 border-orange-200 dark:from-orange-900/20 dark:to-orange-800/20 dark:text-orange-300 dark:border-orange-700'
-                    }`}
-                    style={{ 
-                      animationDelay: `${index * 200}ms`,
-                      animation: 'fadeIn 0.5s ease-in-out forwards'
-                    }}
-                  >
-                    <Sparkles className="w-3 h-3 inline mr-1.5 opacity-60" />
-                    {suggestion}
-                  </button>
-                ))
-              )}
+            {/* Right side - Typing suggestion */}
+            <div className="flex-1 flex justify-end">
+              <button
+                onClick={() => handleSuggestionClick(quickSuggestions[currentSuggestionIndex])}
+                disabled={isLoading}
+                className="px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 dark:text-blue-300 dark:border-blue-700"
+              >
+                <Sparkles className="w-3 h-3 inline mr-1.5 opacity-60" />
+                <span className="typing-text">
+                  {typingText}
+                  {isTyping && <span className="animate-pulse">|</span>}
+                </span>
+              </button>
             </div>
           </div>
         )}
         
         <form onSubmit={handleSubmit} className="relative">
           {/* Single Container - Modern AI Assistant Style */}
-          <div className="relative bg-white dark:bg-gray-800 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent overflow-hidden">
+          <div className="relative bg-white dark:bg-gray-800 rounded-3xl border-2 border-blue-200 dark:border-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-400 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
             
             <div className="flex items-end gap-3 p-4">
-              {/* File Upload Button - Fixed functionality */}
+              {/* File Upload Button */}
               <button
                 type="button"
-                onClick={() => setShowFileUpload(!showFileUpload)}
+                onClick={handleFileUploadClick}
                 disabled={isLoading}
                 className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800"
               >
@@ -416,10 +425,17 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                 />
               </div>
 
+              {/* File Upload Icon (Excel style) */}
+              {uploadedFiles.length > 0 && (
+                <div className="flex-shrink-0 w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                  <FileSpreadsheet className="w-4 h-4 text-white" />
+                </div>
+              )}
+
               {/* Send/Stop Button */}
               <button
-                type={isLoading ? 'button' : 'submit'}
-                onClick={isLoading ? handleStop : undefined}
+                type="button"
+                onClick={handleSendClick}
                 disabled={!isLoading && !message.trim()}
                 className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md ${
                   isLoading

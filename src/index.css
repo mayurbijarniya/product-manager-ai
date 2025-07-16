@@ -13,6 +13,16 @@
   }
 }
 
+.typing-text {
+  min-width: 200px;
+  display: inline-block;
+  text-align: left;
+}
+
+@keyframes typing {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
 .animate-fade-in {
   animation: fadeIn 0.5s ease-in-out forwards;
 }
