@@ -123,7 +123,11 @@ Answer (one word only):`;
 
       const data = await response.json();
       
-      if (!data.candidates || data.candidates.length === 0) {
+      if (!data.candidates || 
+          data.candidates.length === 0 || 
+          !data.candidates[0].content || 
+          !data.candidates[0].content.parts || 
+          data.candidates[0].content.parts.length === 0) {
         console.error('No classification response');
         return true;
       }
