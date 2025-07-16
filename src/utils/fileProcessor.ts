@@ -144,6 +144,8 @@ const generateAIInsights = async (data: any[], fileName: string): Promise<string
   }
 
   try {
+    console.log('🔍 Starting AI analysis for file:', fileName);
+    
     // Prepare data sample for AI analysis (limit to prevent token overflow)
     const sampleSize = Math.min(data.length, 100);
     const dataSample = data.slice(0, sampleSize);
@@ -159,6 +161,13 @@ const generateAIInsights = async (data: any[], fileName: string): Promise<string
           totalRows: data.length,
           sampleData: dataSample
         };
+
+    console.log('📊 Data structure prepared:', { 
+      fileName, 
+      totalRows: data.length, 
+      sampleSize: dataSample.length,
+      hasColumns: typeof data[0] === 'object' && data[0] !== null
+    });
 
     const analysisPrompt = `You are a Senior Product Manager AI assistant. Analyze this uploaded business data and provide actionable product management insights.
 
@@ -181,7 +190,9 @@ const generateAIInsights = async (data: any[], fileName: string): Promise<string
 
 Return your analysis as a structured response with clear sections for each requirement above.`;
 
+    console.log('🤖 Sending analysis request to AI...');
     const aiResponse = await geminiService.sendMessage(analysisPrompt);
+    console.log('✅ AI analysis completed, processing response...');
     
     // Split AI response into insight bullets for display
     const insights = aiResponse
@@ -191,6 +202,7 @@ Return your analysis as a structured response with clear sections for each requi
       .map(line => line.replace(/^[•\-\*]\s*/, '').trim())
       .filter(line => line.length > 10); // Filter out very short lines
     
+    console.log('📋 Generated insights:', insights.length, 'items');
     return insights.length > 0 ? insights : [`AI analysis completed for ${data.length} records`];
     
   } catch (error) {

@@ -22,6 +22,12 @@ export class GeminiService {
   // NEW METHOD: Classification filter using Gemini itself
   private async classifyPMQuestion(message: string): Promise<boolean> {
     try {
+      // Skip classification for file upload analysis - always allow
+      if (message.includes('uploaded and analyzed a file') || message.includes('File Details:')) {
+        console.log('🔄 File upload detected - skipping classification');
+        return true;
+      }
+
       const classificationPrompt = `You are a Product Manager AI content classifier. Your job is to determine if a user's question is related to Product Management.
 
 RESPOND WITH ONLY ONE WORD: "yes" or "no"
@@ -117,26 +123,27 @@ Answer (one word only):`;
       });
 
       if (!response.ok) {
-        console.error('Classification API error:', response.status);
+        console.error('Classification API error:', response.status, response.statusText);
         return true;
       }
 
       const data = await response.json();
+      console.log('🔍 Classification API response:', data);
       
       if (!data.candidates || data.candidates.length === 0) {
-        console.error('No classification response - no candidates');
+        console.error('No classification response - no candidates:', data);
         return true; // Default to allowing PM questions
       }
 
       const candidate = data.candidates[0];
       if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
-        console.error('No classification response - invalid content structure');
+        console.error('No classification response - invalid content structure:', candidate);
         return true; // Default to allowing PM questions
       }
 
       const textPart = candidate.content.parts[0];
       if (!textPart || !textPart.text) {
-        console.error('No classification response - no text in response');
+        console.error('No classification response - no text in response:', textPart);
         return true; // Default to allowing PM questions
       }
 
@@ -154,7 +161,7 @@ Answer (one word only):`;
       }
     } catch (error) {
       console.error('Classification error:', error);
-      return true;
+      return true; // Always default to allowing questions on error
     }
   }
 
