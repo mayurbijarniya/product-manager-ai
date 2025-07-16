@@ -1,5 +1,6 @@
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
+import { geminiService } from './geminiService';
 import type { FileData } from '../types';
 
 export const processFile = async (file: File): Promise<FileData> => {
@@ -31,7 +32,7 @@ export const processFile = async (file: File): Promise<FileData> => {
     }
 
     fileData.processed = true;
-    fileData.insights = generateInsights(fileData.content);
+    fileData.insights = await generateAIInsights(fileData.content, file.name);
     
     return fileData;
   } catch (error) {
@@ -137,49 +138,70 @@ const processText = (file: File): Promise<any[]> => {
   });
 };
 
-const generateInsights = (data: any[]): string[] => {
-  const insights: string[] = [];
-  
+const generateAIInsights = async (data: any[], fileName: string): Promise<string[]> => {
   if (data.length === 0) {
-    insights.push('No data found in file');
-    return insights;
+    return ['No data found in file'];
   }
 
-  // Basic statistics
-  insights.push(`Dataset contains ${data.length} records`);
-  
-  // Column analysis for structured data
-  if (typeof data[0] === 'object' && data[0] !== null) {
-    const columns = Object.keys(data[0]);
-    insights.push(`${columns.length} columns detected: ${columns.slice(0, 5).join(', ')}${columns.length > 5 ? '...' : ''}`);
+  try {
+    // Prepare data sample for AI analysis (limit to prevent token overflow)
+    const sampleSize = Math.min(data.length, 100);
+    const dataSample = data.slice(0, sampleSize);
     
-    // Detect potential numeric columns
-    const numericColumns = columns.filter(col => {
-      const sample = data.slice(0, 100).map(row => row[col]);
-      const numericValues = sample.filter(val => !isNaN(Number(val)) && val !== '');
-      return numericValues.length > sample.length * 0.8;
-    });
+    // Create structured data representation
+    const dataStructure = typeof data[0] === 'object' && data[0] !== null 
+      ? {
+          columns: Object.keys(data[0]),
+          totalRows: data.length,
+          sampleRows: dataSample
+        }
+      : {
+          totalRows: data.length,
+          sampleData: dataSample
+        };
+
+    const analysisPrompt = `You are a Senior Product Manager AI assistant. Analyze this uploaded business data and provide actionable product management insights.
+
+**File:** ${fileName}
+**Total Records:** ${data.length}
+**Data Structure:** ${JSON.stringify(dataStructure, null, 2)}
+
+**Analysis Requirements:**
+1. **Key Patterns & Trends** - Identify meaningful patterns by product, category, time, region, user behavior, etc.
+2. **Opportunities & Concerns** - Highlight business opportunities, potential issues, performance gaps, or areas needing attention
+3. **Actionable Next Steps** - Provide specific, implementable recommendations for product features, pricing, targeting, or strategy
+4. **Strategic KPIs to Track** - Suggest relevant metrics like AOV, churn rate, NPS, conversion rates, retention, etc.
+
+**Important:** 
+- Analyze the ACTUAL DATA VALUES, not just column names
+- Provide specific insights based on the data patterns you see
+- Focus on product management implications
+- Be concise but actionable
+- If data appears incomplete or unclear, mention what additional data would be helpful
+
+Return your analysis as a structured response with clear sections for each requirement above.`;
+
+    const aiResponse = await geminiService.sendMessage(analysisPrompt);
     
-    if (numericColumns.length > 0) {
-      insights.push(`Numeric columns found: ${numericColumns.join(', ')}`);
-    }
+    // Split AI response into insight bullets for display
+    const insights = aiResponse
+      .split('\n')
+      .filter(line => line.trim().length > 0)
+      .slice(0, 8) // Limit to 8 key insights for UI display
+      .map(line => line.replace(/^[•\-\*]\s*/, '').trim())
+      .filter(line => line.length > 10); // Filter out very short lines
     
-    // Detect potential date columns
-    const dateColumns = columns.filter(col => {
-      const sample = data.slice(0, 20).map(row => row[col]);
-      const dateValues = sample.filter(val => {
-        const parsed = new Date(val);
-        return !isNaN(parsed.getTime()) && val !== '';
-      });
-      return dateValues.length > sample.length * 0.5;
-    });
+    return insights.length > 0 ? insights : [`AI analysis completed for ${data.length} records`];
     
-    if (dateColumns.length > 0) {
-      insights.push(`Date columns found: ${dateColumns.join(', ')}`);
-    }
+  } catch (error) {
+    console.error('AI analysis error:', error);
+    // Fallback to basic analysis if AI fails
+    return [
+      `Dataset contains ${data.length} records`,
+      'AI analysis temporarily unavailable - basic file processing completed',
+      'Upload successful - you can now ask questions about this data'
+    ];
   }
-  
-  return insights;
 };
 
 export const exportData = (data: any[], filename: string, format: 'csv' | 'json' | 'xlsx') => {

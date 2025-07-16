@@ -22,23 +22,24 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onClose, onFileProcessed
         
         // Generate analysis insights and send to chat
         if (onFileProcessed && processedFile.insights) {
-          const analysisPrompt = `I've uploaded a file: ${processedFile.name}
+          const analysisPrompt = `I've uploaded and analyzed a file: ${processedFile.name}
 
 **File Details:**
 - Size: ${(processedFile.size / 1024).toFixed(1)} KB
 - Records: ${processedFile.content.length}
 - Type: ${processedFile.type}
 
-**Data Insights:**
+**AI-Generated Product Management Insights:**
 ${processedFile.insights.map(insight => `• ${insight}`).join('\n')}
 
-Please analyze this data from a product management perspective. What insights can you provide about:
-1. Key patterns and trends in the data
-2. Product opportunities or concerns
-3. Recommended actions based on the data
-4. Metrics and KPIs we should track
+**Next Steps:**
+The data has been automatically analyzed with AI-powered insights above. You can now:
+- Ask follow-up questions about specific patterns in the data
+- Request deeper analysis on particular metrics or segments  
+- Get recommendations for product features based on this data
+- Explore strategic implications and action plans
 
-${processedFile.content.length > 0 ? `Here's a sample of the data structure: ${JSON.stringify(processedFile.content[0], null, 2)}` : ''}`;
+What specific aspect of this data analysis would you like to explore further?`;
 
           onFileProcessed(analysisPrompt);
         }
