@@ -92,10 +92,37 @@ const processJSON = (file: File): Promise<any[]> => {
     
     reader.onload = (e) => {
       try {
-        const jsonData = JSON.parse(e.target?.result as string);
-        // Ensure we return an array
-        const data = Array.isArray(jsonData) ? jsonData : [jsonData];
-        resolve(data);
+        const text = e.target?.result as string;
+        
+        try {
+          // Try standard JSON parsing first
+          const jsonData = JSON.parse(text);
+          // Ensure we return an array
+          const data = Array.isArray(jsonData) ? jsonData : [jsonData];
+          resolve(data);
+        } catch (parseError) {
+          // If standard parsing fails, try JSON Lines (JSONL) format
+          console.warn('Standard JSON parsing failed, trying JSONL format:', parseError);
+          
+          const lines = text.split('\n').filter(line => line.trim());
+          const jsonObjects: any[] = [];
+          
+          for (const line of lines) {
+            try {
+              const obj = JSON.parse(line.trim());
+              jsonObjects.push(obj);
+            } catch (lineError) {
+              console.warn(`Failed to parse line as JSON: ${line.substring(0, 50)}...`, lineError);
+              // Continue processing other lines
+            }
+          }
+          
+          if (jsonObjects.length > 0) {
+            resolve(jsonObjects);
+          } else {
+            reject(new Error(`JSON parsing error: ${parseError.message}`));
+          }
+        }
       } catch (error) {
         reject(new Error(`JSON parsing error: ${error}`));
       }

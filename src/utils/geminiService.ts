@@ -142,7 +142,7 @@ Answer (one word only):`;
       }
 
       const candidate = data.candidates[0];
-      if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+      if (!candidate.content || !Array.isArray(candidate.content.parts) || candidate.content.parts.length === 0) {
         console.error('No classification response - invalid content structure:', candidate);
         return true; // Default to allowing PM questions
       }
