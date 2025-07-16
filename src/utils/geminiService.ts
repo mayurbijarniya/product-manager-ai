@@ -123,16 +123,24 @@ Answer (one word only):`;
 
       const data = await response.json();
       
-      if (!data.candidates || 
-          data.candidates.length === 0 || 
-          !data.candidates[0].content || 
-          !data.candidates[0].content.parts || 
-          data.candidates[0].content.parts.length === 0) {
-        console.error('No classification response');
-        return true;
+      if (!data.candidates || data.candidates.length === 0) {
+        console.error('No classification response - no candidates');
+        return true; // Default to allowing PM questions
       }
 
-      const classificationResult = data.candidates[0].content.parts[0].text.toLowerCase().trim();
+      const candidate = data.candidates[0];
+      if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+        console.error('No classification response - invalid content structure');
+        return true; // Default to allowing PM questions
+      }
+
+      const textPart = candidate.content.parts[0];
+      if (!textPart || !textPart.text) {
+        console.error('No classification response - no text in response');
+        return true; // Default to allowing PM questions
+      }
+
+      const classificationResult = textPart.text.toLowerCase().trim();
       
       console.log(`🔍 Classification result: "${classificationResult}" for query: "${message.substring(0, 50)}..."`);
       
