@@ -15,6 +15,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   const [message, setMessage] = useState('');
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState(0);
+  const [isTypingAnimation, setIsTypingAnimation] = useState(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const { 
@@ -32,6 +34,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   // Get conversation-specific state
   const { isLoading, streamingMessage } = getConversationState(conversationId);
 
+  const quickSuggestions = [
+    'Create a competitive analysis',
+    'Help me prioritize features',
+    'Design user research study',
+    'Build KPI dashboard',
+  ];
+
   // Hide suggestions when user starts typing or when there are messages
   useEffect(() => {
     const conversation = getCurrentConversation();
@@ -41,6 +50,32 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
       setShowSuggestions(true);
     }
   }, [getCurrentConversation]);
+
+  // Typing animation effect for suggestions
+  useEffect(() => {
+    if (!showSuggestions) return;
+
+    const interval = setInterval(() => {
+      setCurrentSuggestionIndex((prev) => {
+        const next = (prev + 1) % quickSuggestions.length;
+        if (next === 0) {
+          // Completed one full cycle, show all suggestions
+          setTimeout(() => setIsTypingAnimation(false), 500);
+        }
+        return next;
+      });
+    }, 1500); // Show each suggestion for 1.5 seconds
+
+    return () => clearInterval(interval);
+  }, [showSuggestions, quickSuggestions.length]);
+
+  // Reset animation when suggestions are shown again
+  useEffect(() => {
+    if (showSuggestions) {
+      setCurrentSuggestionIndex(0);
+      setIsTypingAnimation(true);
+    }
+  }, [showSuggestions]);
 
   // Auto-trigger AI response when loading state changes and there's a new user message
   useEffect(() => {
@@ -200,6 +235,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     setShowFileUpload(false);
     // Just close the upload UI, files are now attached
   };
+
   const getFileIcon = (type: string) => {
     if (type.includes('spreadsheet') || type.includes('excel') || type.includes('csv')) {
       return FileSpreadsheet;
@@ -226,13 +262,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     return 'bg-gray-500';
   };
 
-  const quickSuggestions = [
-    'Create a competitive analysis',
-    'Help me prioritize features',
-    'Design user research study',
-    'Build KPI dashboard',
-  ];
-
   const handleSuggestionClick = (suggestion: string) => {
     setMessage(suggestion);
     setShowSuggestions(false);
@@ -248,7 +277,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   return (
     <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl">
       <div className="max-w-4xl mx-auto px-4 sm:px-4 lg:px-6 py-4 sm:py-6">
-        {/* File Attachments - ChatGPT Style */}
+        {/* File Attachments - Modern AI Assistant Style */}
         {uploadedFiles.length > 0 && (
           <div className="mb-4 flex flex-wrap gap-2">
             {uploadedFiles.map((file) => {
@@ -288,6 +317,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
           </div>
         )}
         
+        {/* File Upload Modal */}
         {showFileUpload && (
           <div className="mb-4">
             <FileUpload 
@@ -297,13 +327,71 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
           </div>
         )}
         
+        {/* Sequential Typing Animation Suggestions - Centered */}
+        {!isLoading && showSuggestions && (
+          <div className="mb-6 flex flex-col items-center space-y-3">
+            {/* Static "Try asking:" with typing dots */}
+            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+              <div className="flex space-x-1 mr-2">
+                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
+              Try asking:
+            </div>
+            
+            {/* Sequential suggestion display */}
+            <div className="flex flex-wrap justify-center gap-2 min-h-[40px] items-center">
+              {isTypingAnimation ? (
+                // Show one suggestion at a time during typing animation
+                <button
+                  key={quickSuggestions[currentSuggestionIndex]}
+                  onClick={() => handleSuggestionClick(quickSuggestions[currentSuggestionIndex])}
+                  disabled={isLoading}
+                  className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 animate-fade-in ${
+                    currentSuggestionIndex === 0 ? 'bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 dark:text-blue-300 dark:border-blue-700' :
+                    currentSuggestionIndex === 1 ? 'bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 text-purple-700 border-purple-200 dark:from-purple-900/20 dark:to-purple-800/20 dark:text-purple-300 dark:border-purple-700' :
+                    currentSuggestionIndex === 2 ? 'bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 text-green-700 border-green-200 dark:from-green-900/20 dark:to-green-800/20 dark:text-green-300 dark:border-green-700' :
+                    'bg-gradient-to-r from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 text-orange-700 border-orange-200 dark:from-orange-900/20 dark:to-orange-800/20 dark:text-orange-300 dark:border-orange-700'
+                  }`}
+                >
+                  <Sparkles className="w-3 h-3 inline mr-1.5 opacity-60" />
+                  {quickSuggestions[currentSuggestionIndex]}
+                </button>
+              ) : (
+                // Show all suggestions after animation completes
+                quickSuggestions.map((suggestion, index) => (
+                  <button
+                    key={suggestion}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    disabled={isLoading}
+                    className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 ${
+                      index === 0 ? 'bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 dark:text-blue-300 dark:border-blue-700' :
+                      index === 1 ? 'bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 text-purple-700 border-purple-200 dark:from-purple-900/20 dark:to-purple-800/20 dark:text-purple-300 dark:border-purple-700' :
+                      index === 2 ? 'bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 text-green-700 border-green-200 dark:from-green-900/20 dark:to-green-800/20 dark:text-green-300 dark:border-green-700' :
+                      'bg-gradient-to-r from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 text-orange-700 border-orange-200 dark:from-orange-900/20 dark:to-orange-800/20 dark:text-orange-300 dark:border-orange-700'
+                    }`}
+                    style={{ 
+                      animationDelay: `${index * 200}ms`,
+                      animation: 'fadeIn 0.5s ease-in-out forwards'
+                    }}
+                  >
+                    <Sparkles className="w-3 h-3 inline mr-1.5 opacity-60" />
+                    {suggestion}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit} className="relative">
           {/* Single Container - Modern AI Assistant Style */}
           <div className="relative bg-white dark:bg-gray-800 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
             
             <div className="flex items-end gap-3 p-4">
-              {/* File Upload Button */}
+              {/* File Upload Button - Fixed functionality */}
               <button
                 type="button"
                 onClick={() => setShowFileUpload(!showFileUpload)}
@@ -350,36 +438,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
             </div>
           </div>
         </form>
-
-        {/* Typing Animation Suggestions - Only show for new conversations */}
-        {!isLoading && showSuggestions && (
-          <div className="mt-3 hidden md:flex flex-wrap gap-2">
-            <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mr-3 animate-pulse">
-              <div className="flex space-x-1 mr-2">
-                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-              </div>
-              Try asking:
-            </div>
-            {quickSuggestions.map((suggestion, index) => (
-              <button
-                key={suggestion}
-                onClick={() => handleSuggestionClick(suggestion)}
-                disabled={isLoading}
-                className={`px-3 py-1.5 text-xs font-medium bg-gradient-to-r ${
-                  index === 0 ? 'from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200' :
-                  index === 1 ? 'from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 text-purple-700 border-purple-200' :
-                  index === 2 ? 'from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 text-green-700 border-green-200' :
-                  'from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 text-orange-700 border-orange-200'
-                } dark:from-gray-800 dark:to-gray-700 dark:hover:from-gray-700 dark:hover:to-gray-600 dark:text-gray-300 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900`}
-              >
-                <Sparkles className="w-3 h-3 inline mr-1.5 opacity-60" />
-                {suggestion}
-              </button>
-            ))}
-          </div>
-        )}
 
         {/* Compact Footer info */}
         <div className="flex items-center justify-center mt-3 text-xs text-gray-500 dark:text-gray-400">
