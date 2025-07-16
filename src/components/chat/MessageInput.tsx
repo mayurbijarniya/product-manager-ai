@@ -72,12 +72,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
           clearInterval(typingInterval);
           setIsTyping(false);
           
-          // Show completed text for 1.5 seconds, then move to next
+          // Show completed text for 1 second, then move to next
           suggestionTimeout = setTimeout(() => {
             setCurrentSuggestionIndex((prev) => (prev + 1) % quickSuggestions.length);
-          }, 1500);
+          }, 1000);
         }
-      }, 80); // Typing speed
+      }, 50); // Typing speed
     };
 
     // Start typing the current suggestion
@@ -190,12 +190,15 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   }, [isLoading, conversationId]); // Simplified dependencies to prevent unnecessary re-runs
 
   const handleSubmit = async () => {
-    if (!message.trim() || isLoading) return;
+    const hasContent = message.trim() || uploadedFiles.length > 0;
+    if (!hasContent || isLoading) return;
+
+    console.log("Submit triggered", { message: message.trim(), uploadedFiles: uploadedFiles.length, isLoading });
 
     // Hide suggestions when user sends a message
     setShowSuggestions(false);
 
-    const userMessage = message.trim();
+    const userMessage = message.trim() || "I've uploaded files for analysis. Please analyze the data and provide insights.";
     setMessage('');
     
     // Reset textarea height
@@ -283,6 +286,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   };
 
   const handleSuggestionClick = (suggestion: string) => {
+    console.log("Suggestion clicked:", suggestion);
     setMessage(suggestion);
     setShowSuggestions(false);
     // Focus the textarea after setting the message
@@ -294,17 +298,29 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     }, 0);
   };
 
-  const handleFileUploadClick = () => {
+  // FIXED: Proper click handlers with debugging
+  const handleFileUploadClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("File upload button clicked", { showFileUpload });
     setShowFileUpload(!showFileUpload);
   };
 
-  const handleSendClick = () => {
+  const handleSendClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Send button clicked", { message: message.trim(), isLoading, uploadedFiles: uploadedFiles.length });
+    
     if (isLoading) {
       handleStop();
-    } else if (message.trim()) {
+    } else {
       handleSubmit();
     }
   };
+
+  // FIXED: Proper button enable condition
+  const hasContent = message.trim() || uploadedFiles.length > 0;
+  const canSend = hasContent && !isLoading;
 
   return (
     <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl">
@@ -374,7 +390,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
               </div>
               
               {/* Right side - Typing suggestion */}
-              <div
+              <button
                 onClick={() => handleSuggestionClick(quickSuggestions[currentSuggestionIndex])}
                 className="px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 cursor-pointer border hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 dark:text-blue-300 dark:border-blue-700"
               >
@@ -383,19 +399,17 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                   {typingText}
                   {isTyping && <span className="animate-typing">|</span>}
                 </span>
-              </div>
+              </button>
             </div>
           </div>
         )}
         
-        {/* Input Container */}
+        {/* Input Container - FIXED: Removed overlapping gradient */}
         <div className="relative">
-          {/* Main Input Container */}
           <div className="relative bg-white dark:bg-gray-800 rounded-3xl border-2 border-blue-200 dark:border-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-400 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300"></div>
             
+            {/* Message Input */}
             <div className="flex items-end gap-3 p-4">
-              {/* Message Input - Full width */}
               <div className="flex-1 relative">
                 <textarea
                   ref={textareaRef}
@@ -404,21 +418,22 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                   onKeyDown={handleKeyDown}
                   placeholder="Ask about product strategy, roadmapping, user research, or any PM topic..."
                   disabled={isLoading}
-                  className="relative w-full resize-none focus:outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 transition-all duration-200 text-base leading-relaxed min-h-[24px] py-1"
+                  className="relative w-full resize-none focus:outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 transition-all duration-200 text-base leading-relaxed min-h-[24px] py-1 z-10"
                   rows={1}
                   style={{ maxHeight: '120px' }}
                 />
               </div>
             </div>
 
-            {/* Action Buttons Row - Below text input */}
-            <div className="flex items-center justify-between px-4 pb-4">
+            {/* Action Buttons Row - FIXED: Proper z-index and click handling */}
+            <div className="flex items-center justify-between px-4 pb-4 relative z-20">
               {/* Left side - File upload and other action buttons */}
               <div className="flex items-center space-x-2">
-                {/* File Upload Button */}
+                {/* File Upload Button - FIXED */}
                 <button
                   onClick={handleFileUploadClick}
-                  className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800"
+                  className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 relative z-30"
+                  type="button"
                 >
                   <Paperclip className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
                 </button>
@@ -431,17 +446,18 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                 )}
               </div>
 
-              {/* Right side - Send button */}
+              {/* Right side - Send button - FIXED */}
               <button
                 onClick={handleSendClick}
-                disabled={!message.trim() && !isLoading}
-                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md ${
+                disabled={!canSend}
+                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md relative z-30 ${
                   isLoading
                     ? 'text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105 focus:ring-red-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
-                    : message.trim()
+                    : canSend
                     ? 'text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105 focus:ring-blue-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
                     : 'text-gray-400 bg-gray-100 dark:bg-gray-700 cursor-not-allowed'
                 }`}
+                type="button"
               >
                 {isLoading ? (
                   <Square className="w-4 h-4 fill-current" />
