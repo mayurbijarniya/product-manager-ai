@@ -1,10 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Square, Sparkles, Zap, Lightbulb, Rocket } from 'lucide-react';
+import { Send, Paperclip, Square } from 'lucide-react';
 import { FileSpreadsheet, FileText, File as FileIcon } from 'lucide-react';
-import { Button } from '../ui/Button';
 import { FileUpload } from '../features/FileUpload';
 import { useAppStore } from '../../stores/appStore';
-import type { FileData } from '../../types';
 import { geminiService } from '../../utils/geminiService';
 
 interface MessageInputProps {
@@ -14,10 +12,6 @@ interface MessageInputProps {
 export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) => {
   const [message, setMessage] = useState('');
   const [showFileUpload, setShowFileUpload] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(true);
-  const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState(0);
-  const [typingText, setTypingText] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const { 
@@ -34,69 +28,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
   
   // Get conversation-specific state
   const { isLoading, streamingMessage } = getConversationState(conversationId);
-
-  const quickSuggestions = [
-    'Create a competitive analysis',
-    'Help me prioritize features',
-    'Design user research study',
-    'Build KPI dashboard',
-  ];
-
-  // Hide suggestions when user starts typing or when there are messages
-  useEffect(() => {
-    const conversation = getCurrentConversation();
-    if (conversation && conversation.messages.length > 0) {
-      setShowSuggestions(false);
-    } else {
-      setShowSuggestions(true);
-    }
-  }, [getCurrentConversation]);
-
-  // Continuous typing animation effect
-  useEffect(() => {
-    if (!showSuggestions) return;
-
-    let typingInterval: NodeJS.Timeout;
-    let suggestionTimeout: NodeJS.Timeout;
-
-    const typeText = (text: string) => {
-      setTypingText('');
-      setIsTyping(true);
-      let currentIndex = 0;
-      
-      typingInterval = setInterval(() => {
-        if (currentIndex <= text.length) {
-          setTypingText(text.slice(0, currentIndex));
-          currentIndex++;
-        } else {
-          clearInterval(typingInterval);
-          setIsTyping(false);
-          
-          // Show completed text for 1 second, then move to next
-          suggestionTimeout = setTimeout(() => {
-            setCurrentSuggestionIndex((prev) => (prev + 1) % quickSuggestions.length);
-          }, 1000);
-        }
-      }, 50); // Typing speed
-    };
-
-    // Start typing the current suggestion
-    typeText(quickSuggestions[currentSuggestionIndex]);
-
-    return () => {
-      clearInterval(typingInterval);
-      clearTimeout(suggestionTimeout);
-    };
-  }, [currentSuggestionIndex, showSuggestions, quickSuggestions]);
-
-  // Reset animation when suggestions are shown again
-  useEffect(() => {
-    if (showSuggestions) {
-      setCurrentSuggestionIndex(0);
-      setTypingText('');
-      setIsTyping(false);
-    }
-  }, [showSuggestions]);
 
   // Auto-trigger AI response when loading state changes and there's a new user message
   useEffect(() => {
@@ -187,16 +118,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     };
 
     handleAIResponse();
-  }, [isLoading, conversationId]); // Simplified dependencies to prevent unnecessary re-runs
+  }, [isLoading, conversationId]);
 
   const handleSubmit = async () => {
     const hasContent = message.trim() || uploadedFiles.length > 0;
     if (!hasContent || isLoading) return;
 
     console.log("Submit triggered", { message: message.trim(), uploadedFiles: uploadedFiles.length, isLoading });
-
-    // Hide suggestions when user sends a message
-    setShowSuggestions(false);
 
     const userMessage = message.trim() || "I've uploaded files for analysis. Please analyze the data and provide insights.";
     setMessage('');
@@ -239,18 +167,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = 'auto';
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 80)}px`; // Reduced max height
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
-    
-    // Hide suggestions when user starts typing
-    if (e.target.value.trim() && showSuggestions) {
-      setShowSuggestions(false);
-    }
-    
     adjustTextareaHeight();
   };
 
@@ -285,20 +207,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     return 'bg-gray-500';
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    console.log("Suggestion clicked:", suggestion);
-    setMessage(suggestion);
-    setShowSuggestions(false);
-    // Focus the textarea after setting the message
-    setTimeout(() => {
-      if (textareaRef.current) {
-        textareaRef.current.focus();
-        adjustTextareaHeight();
-      }
-    }, 0);
-  };
-
-  // FIXED: Proper click handlers with debugging
   const handleFileUploadClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -318,16 +226,16 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
     }
   };
 
-  // FIXED: Proper button enable condition
+  // Button enable condition - works with files OR message
   const hasContent = message.trim() || uploadedFiles.length > 0;
   const canSend = hasContent && !isLoading;
 
   return (
     <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl">
-      <div className="max-w-4xl mx-auto px-4 sm:px-4 lg:px-6 py-4 sm:py-6">
-        {/* File Attachments - Modern AI Assistant Style */}
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
+        {/* File Attachments - Compact Mobile Style */}
         {uploadedFiles.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-2">
+          <div className="mb-3 flex flex-wrap gap-2">
             {uploadedFiles.map((file) => {
               const IconComponent = getFileIcon(file.type);
               const typeLabel = getFileTypeLabel(file.type, file.name);
@@ -336,14 +244,14 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
               return (
                 <div
                   key={file.name}
-                  className="flex items-center space-x-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 group max-w-xs"
+                  className="flex items-center space-x-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-all duration-200 group max-w-xs"
                 >
-                  <div className={`w-10 h-10 ${iconColor} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}>
-                    <IconComponent className="w-5 h-5 text-white" />
+                  <div className={`w-6 h-6 sm:w-8 sm:h-8 ${iconColor} rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                    <IconComponent className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
                       {file.name}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -353,9 +261,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                   
                   <button
                     onClick={() => removeFile(file.name)}
-                    className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 flex-shrink-0"
+                    className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100 flex-shrink-0"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -367,7 +275,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
         
         {/* File Upload Modal */}
         {showFileUpload && (
-          <div className="mb-4">
+          <div className="mb-3">
             <FileUpload 
               onClose={() => setShowFileUpload(false)} 
               onFileProcessed={handleFileProcessed}
@@ -375,41 +283,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
           </div>
         )}
         
-        {/* Centered Typing Animation Suggestions */}
-        {!isLoading && showSuggestions && (
-          <div className="mb-6 flex items-center justify-center">
-            <div className="flex items-center space-x-4">
-              {/* Left side - "Try asking:" with dots */}
-              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                <div className="flex space-x-1 mr-2">
-                  <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                </div>
-                Try asking:
-              </div>
-              
-              {/* Right side - Typing suggestion */}
-              <button
-                onClick={() => handleSuggestionClick(quickSuggestions[currentSuggestionIndex])}
-                className="px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 cursor-pointer border hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 text-blue-700 border-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 dark:text-blue-300 dark:border-blue-700"
-              >
-                <Sparkles className="w-3 h-3 inline mr-1.5 opacity-60" />
-                <span className="typing-text min-w-[200px] inline-block">
-                  {typingText}
-                  {isTyping && <span className="animate-typing">|</span>}
-                </span>
-              </button>
-            </div>
-          </div>
-        )}
-        
-        {/* Input Container - FIXED: Removed overlapping gradient */}
+        {/* Compact Input Container */}
         <div className="relative">
-          <div className="relative bg-white dark:bg-gray-800 rounded-3xl border-2 border-blue-200 dark:border-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-400 overflow-hidden">
+          <div className="relative bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl border-2 border-blue-200 dark:border-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-400 overflow-hidden">
             
-            {/* Message Input */}
-            <div className="flex items-end gap-3 p-4">
+            {/* Message Input - Compact */}
+            <div className="flex items-end gap-2 sm:gap-3 p-3 sm:p-4">
               <div className="flex-1 relative">
                 <textarea
                   ref={textareaRef}
@@ -418,39 +297,38 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                   onKeyDown={handleKeyDown}
                   placeholder="Ask about product strategy, roadmapping, user research, or any PM topic..."
                   disabled={isLoading}
-                  className="relative w-full resize-none focus:outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 transition-all duration-200 text-base leading-relaxed min-h-[24px] py-1 z-10"
+                  className="relative w-full resize-none focus:outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 transition-all duration-200 text-sm sm:text-base leading-relaxed min-h-[20px] py-1 z-10"
                   rows={1}
-                  style={{ maxHeight: '120px' }}
+                  style={{ maxHeight: '80px' }}
                 />
               </div>
             </div>
 
-            {/* Action Buttons Row - FIXED: Proper z-index and click handling */}
-            <div className="flex items-center justify-between px-4 pb-4 relative z-20">
-              {/* Left side - File upload and other action buttons */}
+            {/* Action Buttons Row - Below Input */}
+            <div className="flex items-center justify-between px-3 sm:px-4 pb-3 sm:pb-4 relative z-20">
+              {/* Left side - File upload */}
               <div className="flex items-center space-x-2">
-                {/* File Upload Button - FIXED */}
                 <button
                   onClick={handleFileUploadClick}
-                  className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 relative z-30"
+                  className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-300 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 relative z-30"
                   type="button"
                 >
-                  <Paperclip className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                  <Paperclip className="w-3 h-3 sm:w-4 sm:h-4 group-hover:scale-110 transition-transform duration-200" />
                 </button>
 
-                {/* File Upload Icon (Excel style) - Show when files attached */}
+                {/* File Upload Icon - Show when files attached */}
                 {uploadedFiles.length > 0 && (
-                  <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                    <FileSpreadsheet className="w-4 h-4 text-white" />
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                    <FileSpreadsheet className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
                 )}
               </div>
 
-              {/* Right side - Send button - FIXED */}
+              {/* Right side - Send button */}
               <button
                 onClick={handleSendClick}
                 disabled={!canSend}
-                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md relative z-30 ${
+                className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md relative z-30 ${
                   isLoading
                     ? 'text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105 focus:ring-red-500 focus:ring-offset-white dark:focus:ring-offset-gray-800'
                     : canSend
@@ -460,18 +338,17 @@ export const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) =>
                 type="button"
               >
                 {isLoading ? (
-                  <Square className="w-4 h-4 fill-current" />
+                  <Square className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />
                 ) : (
-                  <Send className="w-4 h-4" />
+                  <Send className="w-3 h-3 sm:w-4 sm:h-4" />
                 )}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Compact Footer info */}
-        <div className="flex items-center justify-center mt-3 text-xs text-gray-500 dark:text-gray-400">
-          <Zap className="w-3 h-3 mr-1 opacity-60" />
+        {/* Compact Footer - Reduced spacing */}
+        <div className="flex items-center justify-center mt-2 text-xs text-gray-500 dark:text-gray-400">
           AI can make mistakes. Always verify important information and strategic decisions.
         </div>
       </div>
