@@ -27,6 +27,12 @@ export class GeminiService {
         console.log('🔄 File upload detected - skipping classification');
         return true;
       }
+      
+      // Skip classification for file attachment notifications
+      if (message.includes('File uploaded successfully') || message.includes('📎')) {
+        console.log('🔄 File attachment detected - skipping classification');
+        return true;
+      }
 
       const classificationPrompt = `You are a Product Manager AI content classifier. Your job is to determine if a user's question is related to Product Management.
 
