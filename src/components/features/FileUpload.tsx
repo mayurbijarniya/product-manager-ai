@@ -20,28 +20,24 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onClose, onFileProcessed
         const processedFile = await processFile(file);
         addFile(processedFile);
         
-        // Generate analysis insights and send to chat
-        if (onFileProcessed && processedFile.insights) {
-          const analysisPrompt = `I've uploaded and analyzed a file: ${processedFile.name}
+        // Just notify that file was uploaded successfully
+        if (onFileProcessed) {
+          const uploadNotification = `📎 **File uploaded successfully:** ${processedFile.name}
 
 **File Details:**
 - Size: ${(processedFile.size / 1024).toFixed(1)} KB
 - Records: ${processedFile.content.length}
 - Type: ${processedFile.type}
 
-**AI-Generated Product Management Insights:**
-${processedFile.insights.map(insight => `• ${insight}`).join('\n')}
+✅ **Ready for analysis!** You can now ask me questions about this data, such as:
+- "Analyze the top-performing products"
+- "Show me customer satisfaction trends"
+- "Create a competitive analysis table"
+- "What are the key insights from this data?"
 
-**Next Steps:**
-The data has been automatically analyzed with AI-powered insights above. You can now:
-- Ask follow-up questions about specific patterns in the data
-- Request deeper analysis on particular metrics or segments  
-- Get recommendations for product features based on this data
-- Explore strategic implications and action plans
+What would you like to know about your data?`;
 
-What specific aspect of this data analysis would you like to explore further?`;
-
-          onFileProcessed(analysisPrompt);
+          onFileProcessed(uploadNotification);
         }
       } catch (error) {
         console.error('Error processing file:', error);
@@ -161,20 +157,11 @@ What specific aspect of this data analysis would you like to explore further?`;
                         )}
                       </div>
                       
-                      {file.insights && file.insights.length > 0 && (
-                        <div className="mt-2 space-y-1">
-                          {file.insights.slice(0, 2).map((insight, index) => (
-                            <p key={index} className="text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 px-2 py-1 rounded-lg">
-                              • {insight}
-                            </p>
-                          ))}
-                          {file.insights.length > 2 && (
-                            <p className="text-xs text-light-text-muted dark:text-dark-text-muted">
-                              +{file.insights.length - 2} more insights
-                            </p>
-                          )}
-                        </div>
-                      )}
+                      <div className="mt-2">
+                        <p className="text-xs text-success-light dark:text-success-dark bg-success-light/10 dark:bg-success-dark/10 px-2 py-1 rounded-lg">
+                          📎 Ready for analysis - Ask me questions about this data
+                        </p>
+                      </div>
                     </div>
                   </div>
                   

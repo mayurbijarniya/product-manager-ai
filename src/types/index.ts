@@ -89,7 +89,6 @@ export interface FileData {
   type: string;
   content: any[];
   processed: boolean;
-  insights?: string[];
 }
 
 export interface Theme {
